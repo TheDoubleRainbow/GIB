@@ -11191,13 +11191,23 @@ Vue.component('issues', {
 			return type =='open' ? "#3CCE7D" : "#C8363D"
 		},
 		openIssue: function(issue, event){
-			issue.comments = [];
-			//.. load comments
-			console.log(issue)
-			issue.html = document.getElementById("id-"+issue.id);
-			issue.html.className = "issue-opened"
-			issue.html.querySelector(".issue-first-message").innerHTML = issue.body; issue.html.querySelector(".issue-first-message").style.display = "block"
+			if(issue.opened == false || issue.opened == undefined){
+				issue.opened = true;
+				issue.comments = [];
+				//.. load comments
+				issue.html = document.getElementById("id-"+issue.id);
+				issue.html.className = "issue-opened"
+				issue.html.querySelector(".issue-first-message").innerHTML = issue.body; issue.html.querySelector(".issue-first-message").style.display = "block"
+						
+			}
+			else{
+				issue.opened = false;
+				issue.html = document.getElementById("id-"+issue.id);
+				issue.html.className = "issue";
+				issue.html.querySelector(".issue-first-message").style.display = "none"
 					
+			}
+			
 		}
 	}
 })
