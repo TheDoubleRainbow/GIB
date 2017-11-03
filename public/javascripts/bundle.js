@@ -63,15 +63,18 @@
 /******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
+/******/ ({
+
+/***/ 0:
 /***/ (function(module, exports, __webpack_require__) {
 
 Vue = __webpack_require__(2);
+__webpack_require__(39)
 __webpack_require__(6);
 
 /***/ }),
-/* 1 */
+
+/***/ 1:
 /***/ (function(module, exports) {
 
 var g;
@@ -98,7 +101,8 @@ module.exports = g;
 
 
 /***/ }),
-/* 2 */
+
+/***/ 2:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, setImmediate) {/*!
@@ -10657,7 +10661,8 @@ return Vue$3;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3).setImmediate))
 
 /***/ }),
-/* 3 */
+
+/***/ 3:
 /***/ (function(module, exports, __webpack_require__) {
 
 var apply = Function.prototype.apply;
@@ -10716,7 +10721,22 @@ exports.clearImmediate = clearImmediate;
 
 
 /***/ }),
-/* 4 */
+
+/***/ 39:
+/***/ (function(module, exports) {
+
+axios.get('https://api.github.com/repos/TheDoubleRainbow/GIB/issues')
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+
+
+/***/ }),
+
+/***/ 4:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -10909,7 +10929,8 @@ exports.clearImmediate = clearImmediate;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(5)))
 
 /***/ }),
-/* 5 */
+
+/***/ 5:
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -11099,7 +11120,8 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 6 */
+
+/***/ 6:
 /***/ (function(module, exports) {
 
 new Vue({
@@ -11119,4 +11141,5 @@ new Vue({
 })
 
 /***/ })
-/******/ ]);
+
+/******/ });
