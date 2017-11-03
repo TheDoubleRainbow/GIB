@@ -6151,4 +6151,12 @@ body {
   transition-duration: 0.3s;
   color: #3CCE7D; }
 
+.issue-header .issue-header-status, .issue-header .issue-header-title, .issue-header .issue-header-labels, .issue-header .issue-header-labels * {
+  display: inline-block;
+  margin: 2px 6px 2px 0px; }
+
+.issue-header-status, .issue-header-labels * {
+  padding: 0px 4px 0px 4px;
+  border-radius: 5px; }
+
 /*# sourceMappingURL=style.css.map */
