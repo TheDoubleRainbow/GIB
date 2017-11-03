@@ -6138,13 +6138,17 @@ label.panel-block {
 body {
   padding: 20px 0px 0px 0px; }
 
-.test * {
-  border: 1px solid red; }
-
 #search-button {
   width: 100%; }
 
 #search {
   margin: 0px 0px 60px 0px; }
+
+#labels ul {
+  margin: 10px 0px 0px 10px; }
+
+#labels ul li:hover {
+  transition-duration: 0.3s;
+  color: #3CCE7D; }
 
 /*# sourceMappingURL=style.css.map */

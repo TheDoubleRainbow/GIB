@@ -16,6 +16,12 @@ html
 							.column.is-one-quarter
 								.control
 									button(id="search-button" class="button is-primary") View
-				.columns.test
-					.column.is-one-quarter sd
-					.column sads
+				.columns
+					.column.is-one-quarter#labels
+						b Labels:
+						ul
+							li(v-for="label in labels") {{label}}
+					.column#issues
+						.issue(v-for="issue in issues") 
+
+
