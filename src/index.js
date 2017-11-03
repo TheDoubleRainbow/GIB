@@ -1,1 +1,2 @@
-var a = "Hello world"
+Vue = require("./lib/vue.js");
+require("./app.vue");
