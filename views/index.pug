@@ -21,10 +21,4 @@ html
 					.column.is-one-quarter#labels
 						labels
 					.column#issues
-						.issue(v-for="issue in issues") 
-							.issue-header
-								.issue-header-status(:style="{background: stateBg(issue.state)}") {{issue.state}}
-								.issue-header-title {{issue.title}}
-								.issue-header-labels
-									.issue-header-label(v-for="label in issue.labels")
-										div(class="issue-header-label-name" :style="{background: '#'+label.colour}") {{label.name}}
+						issues
