@@ -14,5 +14,8 @@
     "node-sass-middleware": "0.9.8",
     "pug": "~2.0.0-beta11",
     "serve-favicon": "~2.4.2"
+  },
+  "devDependencies": {
+    "webpack": "^3.8.1"
   }
 }
