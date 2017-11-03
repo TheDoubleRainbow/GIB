@@ -72,6 +72,7 @@ Vue = __webpack_require__(2);
 __webpack_require__(39)
 __webpack_require__(6);
 
+
 /***/ }),
 
 /***/ 1:
