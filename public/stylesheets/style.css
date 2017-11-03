@@ -6136,9 +6136,15 @@ label.panel-block {
   padding: 3rem 1.5rem 6rem; }
 
 body {
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; }
+  padding: 20px 0px 0px 0px; }
 
-a {
-  color: #00B7FF; }
+.test * {
+  border: 1px solid red; }
+
+#search-button {
+  width: 100%; }
+
+#search {
+  margin: 0px 0px 60px 0px; }
 
 /*# sourceMappingURL=style.css.map */

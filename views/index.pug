@@ -6,4 +6,16 @@ html
 		script(src='javascripts/bundle.js' defer)
 	body
 		#app
-			h1 {{test}}
+			.container
+				.columns.is-centered#search
+					.column.is-two-thirds-desktop
+						.columns
+							.column.is-three-quarters
+								.control
+									input(class="input" type="text" placeholder="Repository URL")
+							.column.is-one-quarter
+								.control
+									button(id="search-button" class="button is-primary") View
+				.columns.test
+					.column.is-one-quarter sd
+					.column sads
