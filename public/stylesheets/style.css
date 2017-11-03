@@ -6154,7 +6154,7 @@ body {
 
 .issue-header .issue-header-status, .issue-header .issue-header-title, .issue-header .issue-header-labels, .issue-header .issue-header-labels * {
   display: inline-block;
-  margin: 2px 6px 2px 0px; }
+  margin: 0px 6px 2px 0px; }
 
 .issue-header-status, .issue-header-labels * {
   padding: 0px 4px 0px 4px;
@@ -6170,5 +6170,17 @@ body {
 
 .issue-header:hover {
   margin-left: 10px; }
+
+.issue-opened {
+  padding-left: 15px;
+  margin-bottom: 10px;
+  transition-duration: 0.3s;
+  border-left: 1px grey solid; }
+
+.issue-first-message {
+  display: none;
+  background: #F2F2F2;
+  padding: 5px 10px 5px 10px;
+  border-radius: 20px; }
 
 /*# sourceMappingURL=style.css.map */

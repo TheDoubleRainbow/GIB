@@ -1,7 +1,7 @@
 Vue.component('issues', {
 	template: ` <div>
-				<div class="issue" v-for="issue in issues"> 
-							<div class="issue-header">
+				<div class="issue" v-for="issue in issues" v-bind:id="'id-'+issue.id"> 
+							<div class="issue-header" @click="openIssue(issue, $event)">
 								<div class="issue-header-status" :style="{background: stateBg(issue.state)}"> {{issue.state}} </div>
 								<div class="issue-header-title"> {{issue.title}} </div>
 								<div class="issue-header-labels">
@@ -10,10 +10,13 @@ Vue.component('issues', {
 									</div>
 								</div>
 							</div>
-				</div>`,
+							<div class="issue-body">
+								<div class="issue-message issue-first-message"></div>
+							</div>
+				</div></div>`,
 	data: function(){
 		return {
-			issues: [{id: 0, url: "#", state: "closed", title: "Issue #1", body: "ya buhayu i mne pohui", user: {name: "petya"}, labels: [{id: 1, url: "#", name: "Bug", colour: "f29513"}, {id: 2, url: "#", name: "Feature", colour: "f29513"}]}, {id: 0, url: "#", state: "open", title: "Eshkere Issue #2 Roman Pidor", body: "ya buhayu i mne pohui", user: {name: "petya"}, labels: [{id: 1, url: "#", name: "Bug", colour: "f29513"}, {id: 2, url: "#", name: "Feature", colour: "f29513"}]}]
+			issues: [{id: 0, url: "#", state: "closed", title: "Issue #1", body: "ya kuryu i mne pohui", user: {name: "petya"}, labels: [{id: 1, url: "#", name: "Bug", colour: "f29513"}, {id: 2, url: "#", name: "Feature", colour: "f29513"}]}, {id: 1, url: "#", state: "open", title: "Eshkere Issue #2 Roman Pidor", body: "ya buhayu i mne pohui", user: {name: "petya"}, labels: [{id: 1, url: "#", name: "Bug", colour: "f29513"}, {id: 2, url: "#", name: "Feature", colour: "f29513"}]}]
 
 		}
 	},
@@ -21,9 +24,14 @@ Vue.component('issues', {
 		stateBg: function(type){
 			return type =='open' ? "#3CCE7D" : "#C8363D"
 		},
-		openIssue: function(el, issue){
+		openIssue: function(issue, event){
 			issue.comments = [];
 			//.. load comments
+			console.log(issue)
+			issue.html = document.getElementById("id-"+issue.id);
+			issue.html.className = "issue-opened"
+			issue.html.querySelector(".issue-first-message").innerHTML = issue.body; issue.html.querySelector(".issue-first-message").style.display = "block"
+					
 		}
 	}
 })
