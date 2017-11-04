@@ -6209,10 +6209,10 @@ body {
 
 .circle {
   width: 1px;
-  height: 15px;
+  height: 25px;
   margin: 0 auto;
   margin-top: 10px;
-  margin-bottom: 5px;
+  margin-bottom: 0px;
   border-left: 2px solid #DDE5DF; }
 
 .issue-first-message, .issue-message {
