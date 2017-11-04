@@ -5,7 +5,7 @@ Vue.component('issues', {
 								<div class="issue-header-status" :style="{background: stateBg(issue.state)}"></div>
 								<div class="issue-header-title"> {{issue.title}} </div>
 								<div class="issue-header-url"><a :href="issue.url">View on Github</a></div>
-								<div class="issue-header-pullrequest" v-show="issue.pullrequest"><a :href="issue.pullrequest.url">View pull request</a></div>
+								<div class="issue-header-pullrequest" v-if="issue.pullrequest"><a :href="issue.pullrequest.url">View pull request</a></div>
 								<div class="issue-header-labels">
 									<div class="issue-header-label" v-for="label in issue.labels">
 										<div class="issue-header-label-name" :style="{background: '#'+label.colour}"> {{label.name}} </div>
@@ -44,14 +44,14 @@ Vue.component('issues', {
 				//.. 
 				issue.html = document.getElementById("id-"+issue.id);
 				issue.html.className = "issue-opened"
-				issue.html.querySelector(".issue-first-message").innerHTML = issue.body; issue.html.querySelector(".issue-body").style.display = "block"; issue.html.querySelector(".issue-header-url").style.display = "block";issue.html.querySelector(".issue-header-pullrequest").style.display = "block";
+				issue.html.querySelector(".issue-first-message").innerHTML = issue.body; issue.html.querySelector(".issue-body").style.display = "block"; issue.html.querySelector(".issue-header-url").style.display = "block";if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "block"}
 						
 			}
 			else{
 				issue.opened = false;
 				issue.html = document.getElementById("id-"+issue.id);
 				issue.html.className = "issue";
-				issue.html.querySelector(".issue-body").style.display = "none"; issue.html.querySelector(".issue-header-url").style.display = "none"; issue.html.querySelector(".issue-header-pullrequest").style.display = "none";
+				issue.html.querySelector(".issue-body").style.display = "none"; issue.html.querySelector(".issue-header-url").style.display = "none"; if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "none"}
 					
 			}
 			
