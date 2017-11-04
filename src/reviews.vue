@@ -35,7 +35,9 @@ Vue.component('reviews', {
 							</div>
 						</div>
 					</div>
-				</div>`,
+				</div>
+			</div>
+		</div>`,
 	data: function() {
 		return {
 			reviews: [

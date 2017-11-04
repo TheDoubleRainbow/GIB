@@ -32,12 +32,10 @@ Vue.component('labels', {
 	    },
 	    prepareLabels: function(){
 	    	//var ret = [];
-	    	console.log("labels");
 	    	var that = this;
 			if(this.repoavailable){
 					axios.get(`https://api.github.com/repos/${that.repodata.owner}/${that.repodata.repo}/labels?page=${loops}`)
 					  .then(function (response){
-					  console.log(response);
 					  	response.data.forEach(function(item, i, arr) {
 					  		var typeArray = item.name.split(": ");
 					  		var found = false;
@@ -59,7 +57,6 @@ Vue.component('labels', {
 					  			document.getElementById('reviews').className = 'columns is-centered animated slideInUp'; document.getElementById('reviews').style.display = "flex";
 					  			document.getElementsByTagName('body')[0].style.transitionDuration = '0.3s'; 
 					  			document.getElementsByTagName('body')[0].style.background = 'white';
-					  			console.log('hello')
 					  		}
 						});
 					    //that.labels = ret;
