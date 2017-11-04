@@ -11239,16 +11239,9 @@ Vue.component('labels', {
 	data: function(){
 			return {labels: []}
 		},
-	//created: function(){
-		//console.log(this.repoavailable);
-		//this.labels = this.prepareLabels()
-		//},
 	props:['repodata', 'repoavailable'],
 	watch: {
 			repodata: function(){
-				console.log("watch");
-				//console.log(this.repodata);
-				//this.labels = this.prepareLabels();
 				this.prepareLabels();
 			}
 	},
@@ -11262,53 +11255,34 @@ Vue.component('labels', {
 	        }
 	    },
 	    prepareLabels: function(){
-	    	//console.log("prepareLabels");
 	    	var ret = [];
 	    	var that = this;
 			if(this.repoavailable){
-				//console.log("repoavailable")
 				axios.get(`https://api.github.com/repos/${that.repodata.member}/${that.repodata.repo}/labels`)
 				  .then(function (response){
-				  	console.log("response");
-				  	console.log(response);
 				  	response.data.forEach(function(item, i, arr) {
-
-				  		console.log("forEach"+i);
-
 				  		var typeArray = item.name.split(": ");
 				  		var found = false;
 
 				  		ret.forEach(function(item1, i1, arr1){
 				  			if(item1.type == typeArray[0]){
-				  				console.log("itemtype = typearr");
 				  				ret[i1].subtypes.push(typeArray[1] ? typeArray[1] : "");
 				  				found = true;
 				  			}
 				  		})
 
 				  		if(found == false){
-				  			console.log("push" + i);
 				  			var subtype = typeArray[1] ? typeArray[1] : "";
 				  			ret.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
 				  		}
-
-				  		
-				  		//ret.push({name: item.name, type: typeArray[0], subtype: typeArray[1] ? typeArray[1] : "", color: item.color});
 					});
-					console.log("return");
-					console.log(ret);
-				  	//return ret;
 				    that.labels = ret;
 				  })
 				  .catch(function (error) {
-				  	//console.log(error);
-				  	//return [];
 				  	that.labels = [];
 				    
 				  });
 			} else { 
-				//console.log("reponotavailable")
-				//return [];
 				that.labels = []
 			}; 
 
@@ -11378,7 +11352,7 @@ Vue.component('chat', {
 					<div :class="getMessageType(message)" v-for="message in messages">{{message.user + ': ' + message.text}}</div>
 				</div>
 		        <div class="chat-input">
-		          <input type="text" name="input" class="input" id="0">
+		          <input @keyup.enter="sendMessage" v-model="input" type="text" placeholder="Enter your message" name="input" class="input">
 		        </div>
 		    </div>
         </div>
@@ -11386,12 +11360,13 @@ Vue.component('chat', {
 	props: ['chatid'],
 	data: function() {
 		return {
-			messages: [{user: "Vasya", text: "Hello world"}, {user: "Kolya", text: "sdasdsada"}, {user: "me", text: "Hello it's me Mario"}]
+			input: "",
+			messages: [{user: "Vasya", text: "Hello world"}, {user: "Kolya", text: "sdasdsada"}, {user: "Me", text: "Hello it's me Mario"}, {user: "Rotschild", text: "Gutten Tag"}]
 		}
 	},
 	methods:{
 		getMessageType(message){
-			return message.user == "me" ? "chat-message chat-message-byuser" : "chat-message"
+			return message.user == "Me" ? "chat-message chat-message-byuser" : "chat-message"
 		},
 		openChat(){
 			document.getElementById(this.chatid).style.display = "block"; document.getElementById(this.chatid).style.left = window.innerWidth/2+'';
@@ -11399,6 +11374,10 @@ Vue.component('chat', {
 		},
 		closeChat(){
 			document.getElementById(this.chatid).style.display = "none";
+		},
+		sendMessage(){
+			this.messages.push({user: "Me", text: this.input})
+			console.log(this.messages)
 		}
 	}
 })

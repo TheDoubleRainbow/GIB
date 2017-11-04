@@ -8,7 +8,7 @@ Vue.component('chat', {
 					<div :class="getMessageType(message)" v-for="message in messages">{{message.user + ': ' + message.text}}</div>
 				</div>
 		        <div class="chat-input">
-		          <input type="text" name="input" class="input" id="0">
+		          <input @keyup.enter="sendMessage" v-model="input" type="text" placeholder="Enter your message" name="input" class="input">
 		        </div>
 		    </div>
         </div>
@@ -16,12 +16,13 @@ Vue.component('chat', {
 	props: ['chatid'],
 	data: function() {
 		return {
-			messages: [{user: "Vasya", text: "Hello world"}, {user: "Kolya", text: "sdasdsada"}, {user: "me", text: "Hello it's me Mario"}]
+			input: "",
+			messages: [{user: "Vasya", text: "Hello world"}, {user: "Kolya", text: "sdasdsada"}, {user: "Me", text: "Hello it's me Mario"}, {user: "Rotschild", text: "Gutten Tag"}]
 		}
 	},
 	methods:{
 		getMessageType(message){
-			return message.user == "me" ? "chat-message chat-message-byuser" : "chat-message"
+			return message.user == "Me" ? "chat-message chat-message-byuser" : "chat-message"
 		},
 		openChat(){
 			document.getElementById(this.chatid).style.display = "block"; document.getElementById(this.chatid).style.left = window.innerWidth/2+'';
@@ -29,6 +30,10 @@ Vue.component('chat', {
 		},
 		closeChat(){
 			document.getElementById(this.chatid).style.display = "none";
+		},
+		sendMessage(){
+			this.messages.push({user: "Me", text: this.input})
+			console.log(this.messages)
 		}
 	}
 })
