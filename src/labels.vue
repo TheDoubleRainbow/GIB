@@ -10,15 +10,15 @@ Vue.component('labels', {
 					</ul>
 			</div>`,
 	data: function(){
-		return {
-			labels: 
-				[
-					{type: "Bug", subtypes: ["Bug1", "Bug2"]}, 
-					{type: "Feature", subtypes: ["Feature1", "Feature2"]},
-					{type: "SupDvach", subtypes: ["SupDvach1", "SupDvach2"]}
-				]
-		}
-	},
+			return {labels: []}
+		},
+	created: function(){
+		this.labels = this.prepareLabels()
+		},
+	props:{
+			repodata: {},
+			repoavailable: false
+		},
 	methods:{
 		toogle: function(event){
 			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
@@ -27,6 +27,33 @@ Vue.component('labels', {
 	        } else {
 	            subMenu.classList.add("selected");
 	        }
+	    },
+	    prepareLabels: function(){
+	    	var ret = [];
+			if(this.repoavailable){
+				axios.get(`https://api.github.com/repos/${this.repoData.member}/${this.repoData.repo}/labels`)
+				  .then(function (response) {
+				  	response.forEach(function(item, i, arr) {
+				  		var typeArray = item.name.split(": ");
+				  		ret.push({name: item.name, type: typeArray[0], subtype: typeArray[1] ? typeArray[1] : "", color: item.color});
+					});
+				  	return ret;
+				    console.log(response);
+				  })
+				  .catch(function (error) {
+				  	return [];
+				    console.log(error);
+				  });
+			} else { return [];}; 
+
+		/*return {
+			labels: 
+				[
+					{type: "Bug", subtypes: ["Bug1", "Bug2"]}, 
+					{type: "Feature", subtypes: ["Feature1", "Feature2"]},
+					{type: "SupDvach", subtypes: ["SupDvach1", "SupDvach2"]}
+				]
+		}*/
 	    }
-	}
+	}	
 })

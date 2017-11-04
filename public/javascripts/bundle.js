@@ -11108,13 +11108,13 @@ process.umask = function() { return 0; };
 /* 6 */
 /***/ (function(module, exports) {
 
-axios.get('https://api.github.com/repos/TheDoubleRainbow/GIB/issues')
+/*axios.get('https://api.github.com/repos/TheDoubleRainbow/GIB/issues')
   .then(function (response) {
     console.log(response);
   })
   .catch(function (error) {
     console.log(error);
-  });
+  });*/
 
 
 /***/ }),
@@ -11138,18 +11138,17 @@ Vue.component('search', {
 						</div>
 					</div>
 				</div>`,
-	data: {
-		url: ""
+	data: function() {
+		return {url: ""}
 	},
 	methods:{
 		submit: function(){
 			var repoData = {};
 			if(!this.url){this.url = "";};
 			var urlArray = this.url.split('/').reverse();
+			repoData.member = urlArray[1] ? urlArray[1] : "";
 			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
-			repoData.user = urlArray[1] ? urlArray[1] : "";
 			this.$emit('repodata', repoData);
-			//console.log(repoData);
 		}
 	}
 })
@@ -11234,15 +11233,15 @@ Vue.component('labels', {
 					</ul>
 			</div>`,
 	data: function(){
-		return {
-			labels: 
-				[
-					{type: "Bug", subtypes: ["Bug1", "Bug2"]}, 
-					{type: "Feature", subtypes: ["Feature1", "Feature2"]},
-					{type: "SupDvach", subtypes: ["SupDvach1", "SupDvach2"]}
-				]
-		}
-	},
+			return {labels: []}
+		},
+	created: function(){
+		this.labels = this.prepareLabels()
+		},
+	props:{
+			repodata: {},
+			repoavailable: false
+		},
 	methods:{
 		toogle: function(event){
 			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
@@ -11251,8 +11250,35 @@ Vue.component('labels', {
 	        } else {
 	            subMenu.classList.add("selected");
 	        }
+	    },
+	    prepareLabels: function(){
+	    	var ret = [];
+			if(this.repoavailable){
+				axios.get(`https://api.github.com/repos/${this.repoData.member}/${this.repoData.repo}/labels`)
+				  .then(function (response) {
+				  	response.forEach(function(item, i, arr) {
+				  		var typeArray = item.name.split(": ");
+				  		ret.push({name: item.name, type: typeArray[0], subtype: typeArray[1] ? typeArray[1] : "", color: item.color});
+					});
+				  	return ret;
+				    console.log(response);
+				  })
+				  .catch(function (error) {
+				  	return [];
+				    console.log(error);
+				  });
+			} else { return [];}; 
+
+		/*return {
+			labels: 
+				[
+					{type: "Bug", subtypes: ["Bug1", "Bug2"]}, 
+					{type: "Feature", subtypes: ["Feature1", "Feature2"]},
+					{type: "SupDvach", subtypes: ["SupDvach1", "SupDvach2"]}
+				]
+		}*/
 	    }
-	}
+	}	
 })
 
 /***/ }),
@@ -11261,13 +11287,28 @@ Vue.component('labels', {
 
 new Vue({
 	el: "#app",
-	data: {
-		url: "#"
-	},
-	methods:{
+	data: 
+		{
+			repoData: {
+				member: "",
+				repo: ""
+			},
+			repoAvailable: false
+		},
+	methods: {
 		onRepoData: function(repoData){
-			console.log("app.vue");
-			console.log(repoData);
+			axios.get(`https://api.github.com/repos/${repoData.member}/${repoData.repo}`)
+				  .then(function (response) {
+				  	//this.labelsData = response;
+				    //console.log(response);
+				    this.rapoData = repoData;
+				    this.rapoAvailable = true;
+				  })
+				  .catch(function (error) {
+				    console.log(error);
+				    this.repoData = {member: "", repo: ""};
+				    this.repoAvailable = false;
+				  });
 		},
 		getData: function(){
 			//... load labels/issues
