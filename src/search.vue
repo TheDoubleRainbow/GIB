@@ -1,6 +1,7 @@
 Vue.component('search', {
 	template: `
 				<div>
+					<div id="welcome">Welcome to GIB</div>
 					<div id = "search" class = "columns is-centered">
 						<div class = "column is-two-thirds-desktop">
 							<div class = "columns">
