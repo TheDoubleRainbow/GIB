@@ -7,20 +7,13 @@ body
 	margin: 0px 0px 60px 0px
 #labels ul
 	margin: 10px 0px 0px 10px
-#labels ul li span:hover
+.label-type:hover, .label-subtype:hover
+	transition-duration: 0.3s
 	cursor: default
-.type
-	margin: 10px 0px 0px 10px
-.type-hoverable:hover
-	transition-duration: 0.3s
-	color: #3CCE7D
-.subtype
-	margin: 5px 0px 0px 10px
-.subtype:hover
-	transition-duration: 0.3s
-	color: #3CCE7D
+	color: #49E77D
 #labels ul li .sub-types
     display: none
+    padding-bottom: 10px
 #labels ul li .sub-types.selected
     display: block
     transition: transform .2s

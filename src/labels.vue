@@ -2,9 +2,9 @@ Vue.component('labels', {
 	template: `<div><b>Labels:</b>
 					<ul>
 						<li v-on:click="toogle($event)" v-for="label in labels">
-							<span>{{label.type}}</span>
+							<span class="label-type">{{label.type}}</span>
 							<ul class = "sub-types">
-								<li v-for="subtype in label.subtypes">{{subtype}}</li>
+								<li class="label-subtype" v-for="subtype in label.subtypes">{{subtype}}</li>
 							</ul>
 						</li>
 					</ul>

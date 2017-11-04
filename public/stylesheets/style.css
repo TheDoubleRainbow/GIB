@@ -6144,22 +6144,21 @@ body {
 #search {
   margin: 0px 0px 60px 0px; }
 
-#labels {
-  cursor: default; }
-
-.type {
+#labels ul {
   margin: 10px 0px 0px 10px; }
 
-.type-hoverable:hover {
+.label-type:hover, .label-subtype:hover {
   transition-duration: 0.3s;
-  color: #3CCE7D; }
+  cursor: default;
+  color: #49E77D; }
 
-.subtype {
-  margin: 5px 0px 0px 10px; }
+#labels ul li .sub-types {
+  display: none;
+  padding-bottom: 10px; }
 
-.subtype:hover {
-  transition-duration: 0.3s;
-  color: #3CCE7D; }
+#labels ul li .sub-types.selected {
+  display: block;
+  transition: transform .2s; }
 
 .issue-header .issue-header-status, .issue-header .issue-header-title, .issue-header .issue-header-labels, .issue-header .issue-header-labels * {
   display: inline-block;
