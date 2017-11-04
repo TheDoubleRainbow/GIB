@@ -1,3 +1,4 @@
+var loops = 1;
 Vue.component('labels', {
 	template: `<div @repoData = "prepareLabels"><b>Labels:</b>
 					<ul>
@@ -28,33 +29,40 @@ Vue.component('labels', {
 	        }
 	    },
 	    prepareLabels: function(){
-	    	var ret = [];
+	    	//var ret = [];
 	    	var that = this;
 			if(this.repoavailable){
-				axios.get(`https://api.github.com/repos/${that.repodata.member}/${that.repodata.repo}/labels`)
-				  .then(function (response){
-				  	response.data.forEach(function(item, i, arr) {
-				  		var typeArray = item.name.split(": ");
-				  		var found = false;
+					axios.get(`https://api.github.com/repos/${that.repodata.member}/${that.repodata.repo}/labels?page=${loops}`)
+					  .then(function (response){
+					  console.log(response);
+					  	response.data.forEach(function(item, i, arr) {
+					  		var typeArray = item.name.split(": ");
+					  		var found = false;
 
-				  		ret.forEach(function(item1, i1, arr1){
-				  			if(item1.type == typeArray[0]){
-				  				ret[i1].subtypes.push(typeArray[1] ? typeArray[1] : "");
-				  				found = true;
-				  			}
-				  		})
+					  		that.labels.forEach(function(item1, i1, arr1){
+					  			if(item1.type == typeArray[0]){
+					  				that.labels[i1].subtypes.push(typeArray[1] ? typeArray[1] : "");
+					  				found = true;
+					  			}
+					  		})
 
-				  		if(found == false){
-				  			var subtype = typeArray[1] ? typeArray[1] : "";
-				  			ret.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
-				  		}
-					});
-				    that.labels = ret;
-				  })
-				  .catch(function (error) {
-				  	that.labels = [];
-				    
-				  });
+					  		if(found == false){
+					  			var subtype = typeArray[1] ? typeArray[1] : "";
+					  			that.labels.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
+					  		}
+						});
+					    //that.labels = ret;
+
+					    console.log(response.data);
+					    loops++;
+					    if(response.data.length == 30){
+					    	that.prepareLabels();
+					    }
+					  })
+					  .catch(function (error) {
+					  	that.labels = [];
+					  	//break;
+					 });
 			} else { 
 				that.labels = []
 			}; 

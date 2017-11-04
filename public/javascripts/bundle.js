@@ -95,13 +95,13 @@ module.exports = g;
 /***/ (function(module, exports, __webpack_require__) {
 
 Vue = __webpack_require__(2);
-io = __webpack_require__(12);
-__webpack_require__(6);
-__webpack_require__(11);
+io = __webpack_require__(6);
 __webpack_require__(7);
 __webpack_require__(8);
 __webpack_require__(9);
 __webpack_require__(10);
+__webpack_require__(11);
+__webpack_require__(12);
 
 
 
@@ -11108,290 +11108,6 @@ process.umask = function() { return 0; };
 
 /***/ }),
 /* 6 */
-/***/ (function(module, exports) {
-
-/*axios.get('https://api.github.com/repos/TheDoubleRainbow/GIB/issues')
-  .then(function (response) {
-    console.log(response);
-  })
-  .catch(function (error) {
-    console.log(error);
-  });*/
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports) {
-
-Vue.component('search', {
-	template: `<div id = "search" class = "columns is-centered">
-					<div class = "column is-two-thirds-desktop">
-						<div class = "columns">
-							<div class = "column is-three-quarters">
-								<div class = "control">
-									<input type="text" placeholder="Repository URL" class="input" v-model = "url">
-								</div>
-							</div>
-							<div class = "column is-one-quarter">
-								<div class = "control">
-									<button v-on:click="submit()" id="search-button" class="button is-primary">View</button>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>`,
-	data: function() {
-		return {url: ""}
-	},
-	methods:{
-		submit: function(){
-			var repoData = {};
-			if(!this.url){this.url = "";};
-			var urlArray = this.url.split('/').reverse();
-			repoData.member = urlArray[1] ? urlArray[1] : "";
-			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
-			this.$emit('repodata', repoData);
-		}
-	}
-})
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports) {
-
-Vue.component('issues', {
-	template: ` <div>
-				<div class="issue" v-for="issue in issues" v-bind:id="'id-'+issue.id"> 
-							<div class="issue-header" @click="openIssue(issue, $event)">
-								<div class="issue-header-status" :style="{background: stateBg(issue.state)}"></div>
-								<div class="issue-header-title"> {{issue.title}} </div>
-								<div class="issue-header-url"><a :href="issue.url">View on Github</a></div>
-								<div class="issue-header-pullrequest" v-if="issue.pullrequest"><a :href="issue.pullrequest.url">View pull request</a></div>
-								<div class="issue-header-labels">
-									<div class="issue-header-label" v-for="label in issue.labels">
-										<div class="issue-header-label-name" :style="{background: '#'+label.colour}"> {{label.name}} </div>
-									</div>
-								</div>
-							</div>
-							<div class="issue-body">
-								<div class="issue-message-posted-by">Posted by {{issue.user.name}}</div>
-								<div class="issue-message issue-first-message"></div>
-								<div class="issue-messages">
-									<div class issue-message-wrap v-for="message in issue.messages">
-										<div class="circle"></div>
-										<div class="issue-message-posted-by">Posted by {{message.user.name}}</div>
-										<div class="issue-message">{{message.content}}</div>
-									</div>
-								</div>
-							</div>
-							<chat :chatid="'chat'+issue.id">
-							</chat>
-				</div></div>`,
-	data: function(){
-		return {
-			issues: [{id: 0, url: "#", state: "closed", title: "Issue #1", messages: [], body: "ya kuryu i mne pohui", user: {name: "petya"}, labels: [{id: 1, url: "#", name: "Bug", colour: "f29513"}, {id: 2, url: "#", name: "Feature", colour: "f29513"}], pullrequest: {user: {name: "kolya"}, url: "#123"}}, {id: 1, url: "#", state: "open", title: "Eshkere Issue #2 Roman Pidor", body: "ya buhayu i mne pohui", user: {name: "petya"}, labels: [{id: 1, url: "#", name: "Bug", colour: "f29513"}, {id: 2, url: "#", name: "Feature", colour: "f29513"}], pullrequest: false}]
-
-		}
-	},
-	methods:{
-		stateBg: function(type){
-			return type =='open' ? "#3CCE7D" : "#C8363D"
-		},
-		openIssue: function(issue, event){
-			if(issue.opened == false || issue.opened == undefined || event.target.innerHTML == "View on Github" || event.target.innerHTML == "View pull request"){
-				issue.opened = true;
-				//.. load messages
-				issue.messages = [{user: {name: "vasya"}, content: "Lorem ipsum dolor idi naxuy Vivamus eleifend scelerisque neque et facilisis. Nullam vel quam nec arcu elementum tempor. Vivamus gravida ipsum ut nisl blandit dignissim."},
-								{user: {name: "Lil Pump"}, content: "EDU V MAGAZIN GUCCI V ZHMERINKE"}
-								 ];
-				//.. 
-				issue.html = document.getElementById("id-"+issue.id);
-				issue.html.className = "issue-opened"
-				issue.html.querySelector(".issue-first-message").innerHTML = issue.body; issue.html.querySelector(".issue-body").style.display = "block"; issue.html.querySelector(".issue-header-url").style.display = "block";if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "block"} issue.html.querySelector(".chat-open").style.display = "block";
-						
-			}
-			else{
-				issue.opened = false;
-				issue.html = document.getElementById("id-"+issue.id);
-				issue.html.className = "issue";
-				issue.html.querySelector(".issue-body").style.display = "none"; issue.html.querySelector(".issue-header-url").style.display = "none"; if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "none"} issue.html.querySelector(".chat-open").style.display = "none";
-					
-			}
-			
-		}
-	}
-})
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports) {
-
-Vue.component('labels', {
-	template: `<div @repoData = "prepareLabels"><b>Labels:</b>
-					<ul>
-						<li v-on:click="toogle($event)" v-for="label in labels">
-							<span class="label-type">{{label.type}}</span>
-							<ul class = "sub-types">
-								<li class="label-subtype" v-for="subtype in label.subtypes">{{subtype}}</li>
-							</ul>
-						</li>
-					</ul>
-			</div>`,
-	data: function(){
-			return {labels: []}
-		},
-	props:['repodata', 'repoavailable'],
-	watch: {
-			repodata: function(){
-				this.prepareLabels();
-			}
-	},
-	methods:{
-		toogle: function(event){
-			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
-	        if (subMenu.classList.contains('selected')) {
-	            subMenu.classList.remove("selected");
-	        } else {
-	            subMenu.classList.add("selected");
-	        }
-	    },
-	    prepareLabels: function(){
-	    	var ret = [];
-	    	var that = this;
-			if(this.repoavailable){
-				axios.get(`https://api.github.com/repos/${that.repodata.member}/${that.repodata.repo}/labels`)
-				  .then(function (response){
-				  	response.data.forEach(function(item, i, arr) {
-				  		var typeArray = item.name.split(": ");
-				  		var found = false;
-
-				  		ret.forEach(function(item1, i1, arr1){
-				  			if(item1.type == typeArray[0]){
-				  				ret[i1].subtypes.push(typeArray[1] ? typeArray[1] : "");
-				  				found = true;
-				  			}
-				  		})
-
-				  		if(found == false){
-				  			var subtype = typeArray[1] ? typeArray[1] : "";
-				  			ret.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
-				  		}
-					});
-				    that.labels = ret;
-				  })
-				  .catch(function (error) {
-				  	that.labels = [];
-				    
-				  });
-			} else { 
-				that.labels = []
-			}; 
-
-		/*return {
-			labels: 
-				[
-					{type: "Bug", subtypes: ["Bug1", "Bug2"]}, 
-					{type: "Feature", subtypes: ["Feature1", "Feature2"]},
-					{type: "SupDvach", subtypes: ["SupDvach1", "SupDvach2"]}
-				]
-		}*/
-	    }
-	}	
-})
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-new Vue({
-	el: "#app",
-	data: 
-		{
-			repoData: {
-				member: "AAAA",
-				repo: "FFFF"
-			},
-			repoAvailable: false
-		},
-	methods: {
-		onRepoData: function(repoData){
-			var that = this;
-			axios.get(`https://api.github.com/repos/${repoData.member}/${repoData.repo}`)
-				  .then(function (response) {
-				  	//this.labelsData = response;
-				    //console.log(response);
-				    that.repoData = repoData;
-				    that.repoAvailable = true;
-				    //that.$emit('repodata', that.repoData);
-				    console.log("axios");
-				    console.log(that.repoData);
-				  })
-				  .catch(function (error) {
-				    console.log(error);
-				    that.repoData = {member: "", repo: ""};
-				    that.repoAvailable = false;
-				  });
-
-		},
-		getData: function(){
-			//... load labels/issues
-		}
-	}
-})
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports) {
-
-Vue.component('chat', {
-	template: `
-		<div>
-			<div class="chat-open" @click="openChat()">Open chat</div>
-			<div class="chat-body animated zoomInUp" :id="chatid">
-				<a @click="closeChat" class="delete chat-close"></a>
-				<div class="chat-display">
-					<div :class="getMessageType(message)" v-for="message in messages">{{message.user + ': ' + message.text}}</div>
-				</div>
-		        <div class="chat-input">
-		          <input @keyup.enter="sendMessage" v-model="input" type="text" placeholder="Enter your message" name="input" class="input">
-		        </div>
-		    </div>
-        </div>
-	`,
-	props: ['chatid'],
-	data: function() {
-		return {
-			input: "",
-			messages: [{user: "Vasya", text: "Hello world"}, {user: "Kolya", text: "sdasdsada"}, {user: "Me", text: "Hello it's me Mario"}, {user: "Rotschild", text: "Gutten Tag"}]
-		}
-	},
-	methods:{
-		getMessageType(message){
-			return message.user == "Me" ? "chat-message chat-message-byuser" : "chat-message"
-		},
-		openChat(){
-			var socket = io.connect();
-			
-
-			socket.on('getMessages', function(mess){
-				//.....
-			});
-			document.getElementById(this.chatid).className = "chat-body animated zoomInUp"; document.getElementById(this.chatid).style.display = "block"; document.getElementById(this.chatid).style.left = window.innerWidth/2+'';
-
-		},
-		closeChat(){
-			document.getElementById(this.chatid).className = "chat-body animated zoomOutUp"
-			//document.getElementById(this.chatid).style.display = "none";
-		},
-		sendMessage(){
-			this.messages.push({user: "Me", text: this.input})
-			this.input = ""
-		}
-	}
-})
-
-/***/ }),
-/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -19595,6 +19311,298 @@ return /******/ (function(modules) { // webpackBootstrap
 });
 ;
 //# sourceMappingURL=socket.io.js.map
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports) {
+
+/*axios.get('https://api.github.com/repos/TheDoubleRainbow/GIB/issues')
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });*/
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
+
+Vue.component('chat', {
+	template: `
+		<div>
+			<div class="chat-open" @click="openChat()">Open chat</div>
+			<div class="chat-body animated zoomInUp" :id="chatid">
+				<a @click="closeChat" class="delete chat-close"></a>
+				<div class="chat-display">
+					<div :class="getMessageType(message)" v-for="message in messages">{{message.user + ': ' + message.text}}</div>
+				</div>
+		        <div class="chat-input">
+		          <input @keyup.enter="sendMessage" v-model="input" type="text" placeholder="Enter your message" name="input" class="input">
+		        </div>
+		    </div>
+        </div>
+	`,
+	props: ['chatid'],
+	data: function() {
+		return {
+			input: "",
+			messages: [{user: "Vasya", text: "Hello world"}, {user: "Kolya", text: "sdasdsada"}, {user: "Me", text: "Hello it's me Mario"}, {user: "Rotschild", text: "Gutten Tag"}]
+		}
+	},
+	methods:{
+		getMessageType(message){
+			return message.user == "Me" ? "chat-message chat-message-byuser" : "chat-message"
+		},
+		openChat(){
+			var socket = io.connect();
+			
+
+			socket.on('getMessages', function(mess){
+				//.....
+			});
+			document.getElementById(this.chatid).className = "chat-body animated zoomInUp"; document.getElementById(this.chatid).style.display = "block"; document.getElementById(this.chatid).style.left = window.innerWidth/2+'';
+
+		},
+		closeChat(){
+			document.getElementById(this.chatid).className = "chat-body animated zoomOutUp"
+			//document.getElementById(this.chatid).style.display = "none";
+		},
+		sendMessage(){
+			this.messages.push({user: "Me", text: this.input})
+			this.input = ""
+		}
+	}
+})
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+Vue.component('search', {
+	template: `<div id = "search" class = "columns is-centered">
+					<div class = "column is-two-thirds-desktop">
+						<div class = "columns">
+							<div class = "column is-three-quarters">
+								<div class = "control">
+									<input type="text" placeholder="Repository URL" class="input" v-model = "url">
+								</div>
+							</div>
+							<div class = "column is-one-quarter">
+								<div class = "control">
+									<button v-on:click="submit()" id="search-button" class="button is-primary">View</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>`,
+	data: function() {
+		return {url: ""}
+	},
+	methods:{
+		submit: function(){
+			var repoData = {};
+			if(!this.url){this.url = "";};
+			var urlArray = this.url.split('/').reverse();
+			repoData.member = urlArray[1] ? urlArray[1] : "";
+			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
+			this.$emit('repodata', repoData);
+		}
+	}
+})
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports) {
+
+Vue.component('issues', {
+	template: ` <div>
+				<div class="issue" v-for="issue in issues" v-bind:id="'id-'+issue.id"> 
+							<div class="issue-header" @click="openIssue(issue, $event)">
+								<div class="issue-header-status" :style="{background: stateBg(issue.state)}"></div>
+								<div class="issue-header-title"> {{issue.title}} </div>
+								<div class="issue-header-url"><a :href="issue.url">View on Github</a></div>
+								<div class="issue-header-pullrequest" v-if="issue.pullrequest"><a :href="issue.pullrequest.url">View pull request</a></div>
+								<div class="issue-header-labels">
+									<div class="issue-header-label" v-for="label in issue.labels">
+										<div class="issue-header-label-name" :style="{background: '#'+label.colour}"> {{label.name}} </div>
+									</div>
+								</div>
+							</div>
+							<div class="issue-body">
+								<div class="issue-message-posted-by">Posted by {{issue.user.name}}</div>
+								<div class="issue-message issue-first-message"></div>
+								<div class="issue-messages">
+									<div class issue-message-wrap v-for="message in issue.messages">
+										<div class="circle"></div>
+										<div class="issue-message-posted-by">Posted by {{message.user.name}}</div>
+										<div class="issue-message">{{message.content}}</div>
+									</div>
+								</div>
+							</div>
+							<chat :chatid="'chat'+issue.id">
+							</chat>
+				</div></div>`,
+	data: function(){
+		return {
+			issues: [{id: 0, url: "#", state: "closed", title: "Issue #1", messages: [], body: "ya kuryu i mne pohui", user: {name: "petya"}, labels: [{id: 1, url: "#", name: "Bug", colour: "f29513"}, {id: 2, url: "#", name: "Feature", colour: "f29513"}], pullrequest: {user: {name: "kolya"}, url: "#123"}}, {id: 1, url: "#", state: "open", title: "Eshkere Issue #2 Roman Pidor", body: "ya buhayu i mne pohui", user: {name: "petya"}, labels: [{id: 1, url: "#", name: "Bug", colour: "f29513"}, {id: 2, url: "#", name: "Feature", colour: "f29513"}], pullrequest: false}]
+
+		}
+	},
+	methods:{
+		stateBg: function(type){
+			return type =='open' ? "#3CCE7D" : "#C8363D"
+		},
+		openIssue: function(issue, event){
+			if(issue.opened == false || issue.opened == undefined || event.target.innerHTML == "View on Github" || event.target.innerHTML == "View pull request"){
+				issue.opened = true;
+				//.. load messages
+				issue.messages = [{user: {name: "vasya"}, content: "Lorem ipsum dolor idi naxuy Vivamus eleifend scelerisque neque et facilisis. Nullam vel quam nec arcu elementum tempor. Vivamus gravida ipsum ut nisl blandit dignissim."},
+								{user: {name: "Lil Pump"}, content: "EDU V MAGAZIN GUCCI V ZHMERINKE"}
+								 ];
+				//.. 
+				issue.html = document.getElementById("id-"+issue.id);
+				issue.html.className = "issue-opened"
+				issue.html.querySelector(".issue-first-message").innerHTML = issue.body; issue.html.querySelector(".issue-body").style.display = "block"; issue.html.querySelector(".issue-header-url").style.display = "block";if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "block"} issue.html.querySelector(".chat-open").style.display = "block";
+						
+			}
+			else{
+				issue.opened = false;
+				issue.html = document.getElementById("id-"+issue.id);
+				issue.html.className = "issue";
+				issue.html.querySelector(".issue-body").style.display = "none"; issue.html.querySelector(".issue-header-url").style.display = "none"; if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "none"} issue.html.querySelector(".chat-open").style.display = "none";
+					
+			}
+			
+		}
+	}
+})
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+var loops = 1;
+Vue.component('labels', {
+	template: `<div @repoData = "prepareLabels"><b>Labels:</b>
+					<ul>
+						<li v-on:click="toogle($event)" v-for="label in labels">
+							<span class="label-type">{{label.type}}</span>
+							<ul class = "sub-types">
+								<li class="label-subtype" v-for="subtype in label.subtypes">{{subtype}}</li>
+							</ul>
+						</li>
+					</ul>
+			</div>`,
+	data: function(){
+			return {labels: []}
+		},
+	props:['repodata', 'repoavailable'],
+	watch: {
+			repodata: function(){
+				this.prepareLabels();
+			}
+	},
+	methods:{
+		toogle: function(event){
+			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
+	        if (subMenu.classList.contains('selected')) {
+	            subMenu.classList.remove("selected");
+	        } else {
+	            subMenu.classList.add("selected");
+	        }
+	    },
+	    prepareLabels: function(){
+	    	//var ret = [];
+	    	var that = this;
+			if(this.repoavailable){
+					axios.get(`https://api.github.com/repos/${that.repodata.member}/${that.repodata.repo}/labels?page=${loops}`)
+					  .then(function (response){
+					  console.log(response);
+					  	response.data.forEach(function(item, i, arr) {
+					  		var typeArray = item.name.split(": ");
+					  		var found = false;
+
+					  		that.labels.forEach(function(item1, i1, arr1){
+					  			if(item1.type == typeArray[0]){
+					  				that.labels[i1].subtypes.push(typeArray[1] ? typeArray[1] : "");
+					  				found = true;
+					  			}
+					  		})
+
+					  		if(found == false){
+					  			var subtype = typeArray[1] ? typeArray[1] : "";
+					  			that.labels.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
+					  		}
+						});
+					    //that.labels = ret;
+
+					    console.log(response.data);
+					    loops++;
+					    if(response.data.length == 30){
+					    	that.prepareLabels();
+					    }
+					  })
+					  .catch(function (error) {
+					  	that.labels = [];
+					  	//break;
+					 });
+			} else { 
+				that.labels = []
+			}; 
+
+		/*return {
+			labels: 
+				[
+					{type: "Bug", subtypes: ["Bug1", "Bug2"]}, 
+					{type: "Feature", subtypes: ["Feature1", "Feature2"]},
+					{type: "SupDvach", subtypes: ["SupDvach1", "SupDvach2"]}
+				]
+		}*/
+	    }
+	}	
+})
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports) {
+
+new Vue({
+	el: "#app",
+	data: 
+		{
+			repoData: {
+				member: "AAAA",
+				repo: "FFFF"
+			},
+			repoAvailable: false
+		},
+	methods: {
+		onRepoData: function(repoData){
+			var that = this;
+			axios.get(`https://api.github.com/repos/${repoData.member}/${repoData.repo}`)
+				  .then(function (response) {
+				  	//this.labelsData = response;
+				    //console.log(response);
+				    that.repoData = repoData;
+				    that.repoAvailable = true;
+				    //that.$emit('repodata', that.repoData);
+				    console.log("axios");
+				    console.log(that.repoData);
+				  })
+				  .catch(function (error) {
+				    console.log(error);
+				    that.repoData = {member: "", repo: ""};
+				    that.repoAvailable = false;
+				  });
+
+		},
+		getData: function(){
+			//... load labels/issues
+		}
+	}
+})
 
 /***/ })
 /******/ ]);
