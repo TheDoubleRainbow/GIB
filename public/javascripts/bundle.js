@@ -96,11 +96,11 @@ module.exports = g;
 
 Vue = __webpack_require__(2);
 __webpack_require__(6);
-__webpack_require__(11);
 __webpack_require__(7);
 __webpack_require__(8);
 __webpack_require__(9);
 __webpack_require__(10);
+__webpack_require__(11);
 
 
 
@@ -11122,6 +11122,45 @@ process.umask = function() { return 0; };
 /* 7 */
 /***/ (function(module, exports) {
 
+Vue.component('chat', {
+	template: `
+		<div>
+			<div class="chat-open" @click="openChat()">Open chat</div>
+			<div class="chat-body" :id="chatid">
+				<a @click="closeChat" class="delete chat-close"></a>
+				<div class="chat-display">
+					<div :class="getMessageType(message)" v-for="message in messages">{{message.user + ': ' + message.text}}</div>
+				</div>
+		        <div class="chat-input">
+		          <input type="text" name="input" class="input" id="0">
+		        </div>
+		    </div>
+        </div>
+	`,
+	props: ['chatid'],
+	data: function() {
+		return {
+			messages: [{user: "Vasya", text: "Hello world"}, {user: "Kolya", text: "sdasdsada"}, {user: "me", text: "Hello it's me Mario"}]
+		}
+	},
+	methods:{
+		getMessageType(message){
+			return message.user == "me" ? "chat-message chat-message-byuser" : "chat-message"
+		},
+		openChat(){
+			document.getElementById(this.chatid).style.display = "block"; document.getElementById(this.chatid).style.left = window.innerWidth/2+'';
+
+		},
+		closeChat(){
+			document.getElementById(this.chatid).style.display = "none";
+		}
+	}
+})
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
+
 Vue.component('search', {
 	template: `<div id = "search" class = "columns is-centered">
 					<div class = "column is-two-thirds-desktop">
@@ -11155,7 +11194,7 @@ Vue.component('search', {
 })
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 Vue.component('issues', {
@@ -11222,9 +11261,10 @@ Vue.component('issues', {
 })
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
+var loops = 1;
 Vue.component('labels', {
 	template: `<div @repoData = "prepareLabels"><b>Labels:</b>
 					<ul>
@@ -11239,16 +11279,9 @@ Vue.component('labels', {
 	data: function(){
 			return {labels: []}
 		},
-	//created: function(){
-		//console.log(this.repoavailable);
-		//this.labels = this.prepareLabels()
-		//},
 	props:['repodata', 'repoavailable'],
 	watch: {
 			repodata: function(){
-				console.log("watch");
-				//console.log(this.repodata);
-				//this.labels = this.prepareLabels();
 				this.prepareLabels();
 			}
 	},
@@ -11262,53 +11295,41 @@ Vue.component('labels', {
 	        }
 	    },
 	    prepareLabels: function(){
-	    	//console.log("prepareLabels");
-	    	var ret = [];
+	    	//var ret = [];
 	    	var that = this;
 			if(this.repoavailable){
-				//console.log("repoavailable")
-				axios.get(`https://api.github.com/repos/${that.repodata.member}/${that.repodata.repo}/labels`)
-				  .then(function (response){
-				  	console.log("response");
-				  	console.log(response);
-				  	response.data.forEach(function(item, i, arr) {
+					axios.get(`https://api.github.com/repos/${that.repodata.member}/${that.repodata.repo}/labels?page=${loops}`)
+					  .then(function (response){
+					  console.log(response);
+					  	response.data.forEach(function(item, i, arr) {
+					  		var typeArray = item.name.split(": ");
+					  		var found = false;
 
-				  		console.log("forEach"+i);
+					  		that.labels.forEach(function(item1, i1, arr1){
+					  			if(item1.type == typeArray[0]){
+					  				that.labels[i1].subtypes.push(typeArray[1] ? typeArray[1] : "");
+					  				found = true;
+					  			}
+					  		})
 
-				  		var typeArray = item.name.split(": ");
-				  		var found = false;
+					  		if(found == false){
+					  			var subtype = typeArray[1] ? typeArray[1] : "";
+					  			that.labels.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
+					  		}
+						});
+					    //that.labels = ret;
 
-				  		ret.forEach(function(item1, i1, arr1){
-				  			if(item1.type == typeArray[0]){
-				  				console.log("itemtype = typearr");
-				  				ret[i1].subtypes.push(typeArray[1] ? typeArray[1] : "");
-				  				found = true;
-				  			}
-				  		})
-
-				  		if(found == false){
-				  			console.log("push" + i);
-				  			var subtype = typeArray[1] ? typeArray[1] : "";
-				  			ret.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
-				  		}
-
-				  		
-				  		//ret.push({name: item.name, type: typeArray[0], subtype: typeArray[1] ? typeArray[1] : "", color: item.color});
-					});
-					console.log("return");
-					console.log(ret);
-				  	//return ret;
-				    that.labels = ret;
-				  })
-				  .catch(function (error) {
-				  	//console.log(error);
-				  	//return [];
-				  	that.labels = [];
-				    
-				  });
+					    console.log(response.data);
+					    loops++;
+					    if(response.data.length == 30){
+					    	that.prepareLabels();
+					    }
+					  })
+					  .catch(function (error) {
+					  	that.labels = [];
+					  	//break;
+					 });
 			} else { 
-				//console.log("reponotavailable")
-				//return [];
 				that.labels = []
 			}; 
 
@@ -11325,7 +11346,7 @@ Vue.component('labels', {
 })
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 new Vue({
@@ -11360,45 +11381,6 @@ new Vue({
 		},
 		getData: function(){
 			//... load labels/issues
-		}
-	}
-})
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports) {
-
-Vue.component('chat', {
-	template: `
-		<div>
-			<div class="chat-open" @click="openChat()">Open chat</div>
-			<div class="chat-body" :id="chatid">
-				<a @click="closeChat" class="delete chat-close"></a>
-				<div class="chat-display">
-					<div :class="getMessageType(message)" v-for="message in messages">{{message.user + ': ' + message.text}}</div>
-				</div>
-		        <div class="chat-input">
-		          <input type="text" name="input" class="input" id="0">
-		        </div>
-		    </div>
-        </div>
-	`,
-	props: ['chatid'],
-	data: function() {
-		return {
-			messages: [{user: "Vasya", text: "Hello world"}, {user: "Kolya", text: "sdasdsada"}, {user: "me", text: "Hello it's me Mario"}]
-		}
-	},
-	methods:{
-		getMessageType(message){
-			return message.user == "me" ? "chat-message chat-message-byuser" : "chat-message"
-		},
-		openChat(){
-			document.getElementById(this.chatid).style.display = "block"; document.getElementById(this.chatid).style.left = window.innerWidth/2+'';
-
-		},
-		closeChat(){
-			document.getElementById(this.chatid).style.display = "none";
 		}
 	}
 })
