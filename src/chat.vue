@@ -25,11 +25,17 @@ Vue.component('chat', {
 			return message.user == "Me" ? "chat-message chat-message-byuser" : "chat-message"
 		},
 		openChat(){
+			var socket = io.connect();
+			
+
+			socket.on('getMessages', function(mess){
+				//.....
+			});
 			document.getElementById(this.chatid).className = "chat-body animated zoomInUp"; document.getElementById(this.chatid).style.display = "block"; document.getElementById(this.chatid).style.left = window.innerWidth/2+'';
 
 		},
 		closeChat(){
-			document.getElementById(this.chatid).className = "chat-body animated zoomOut"
+			document.getElementById(this.chatid).className = "chat-body animated zoomOutUp"
 			//document.getElementById(this.chatid).style.display = "none";
 		},
 		sendMessage(){
