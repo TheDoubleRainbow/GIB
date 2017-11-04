@@ -1,7 +1,7 @@
 doctype html
 html
 	head
-		title = title
+		title GitHub Issue Browser
 		link(rel='stylesheet', href='/stylesheets/style.css')
 		script(src='https://unpkg.com/axios/dist/axios.min.js' defer)
 		script(src='javascripts/bundle.js' defer)
@@ -10,7 +10,7 @@ html
 			.container
 				search(v-on:repodata = "onRepoData")
 				.columns.is-centered
-					.column.is-3#labels
+					.column.is-2#labels
 						labels
 					.column.is-7#issues
 						issues

@@ -60,11 +60,26 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
+/******/ ({
+
+/***/ 0:
+/***/ (function(module, exports, __webpack_require__) {
+
+Vue = __webpack_require__(2);
+__webpack_require__(39);
+__webpack_require__(91);
+__webpack_require__(90);
+__webpack_require__(89);
+__webpack_require__(6);
+
+
+
+/***/ }),
+
+/***/ 1:
 /***/ (function(module, exports) {
 
 var g;
@@ -91,20 +106,8 @@ module.exports = g;
 
 
 /***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
 
-Vue = __webpack_require__(2);
-__webpack_require__(6);
-__webpack_require__(7);
-__webpack_require__(8);
-__webpack_require__(9);
-__webpack_require__(10);
-
-
-
-/***/ }),
-/* 2 */
+/***/ 2:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, setImmediate) {/*!
@@ -10660,10 +10663,11 @@ return Vue$3;
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(3).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3).setImmediate))
 
 /***/ }),
-/* 3 */
+
+/***/ 3:
 /***/ (function(module, exports, __webpack_require__) {
 
 var apply = Function.prototype.apply;
@@ -10722,7 +10726,22 @@ exports.clearImmediate = clearImmediate;
 
 
 /***/ }),
-/* 4 */
+
+/***/ 39:
+/***/ (function(module, exports) {
+
+axios.get('https://api.github.com/repos/TheDoubleRainbow/GIB/issues')
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+
+
+/***/ }),
+
+/***/ 4:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -10912,10 +10931,11 @@ exports.clearImmediate = clearImmediate;
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(5)))
 
 /***/ }),
-/* 5 */
+
+/***/ 5:
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -11105,57 +11125,66 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 6 */
+
+/***/ 6:
 /***/ (function(module, exports) {
 
-axios.get('https://api.github.com/repos/TheDoubleRainbow/GIB/issues')
-  .then(function (response) {
-    console.log(response);
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports) {
-
-Vue.component('search', {
-	template: `<div id = "search" class = "columns is-centered">
-					<div class = "column is-two-thirds-desktop">
-						<div class = "columns">
-							<div class = "column is-three-quarters">
-								<div class = "control">
-									<input type="text" placeholder="Repository URL" class="input" v-model = "url">
-								</div>
-							</div>
-							<div class = "column is-one-quarter">
-								<div class = "control">
-									<button v-on:click="submit()" id="search-button" class="button is-primary">View</button>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>`,
+new Vue({
+	el: "#app",
 	data: {
-		url: ""
+		url: "#"
 	},
 	methods:{
-		submit: function(){
-			var repoData = {};
-			if(!this.url){this.url = "";};
-			var urlArray = this.url.split('/').reverse();
-			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
-			repoData.user = urlArray[1] ? urlArray[1] : "";
-			this.$emit('repodata', repoData);
-			//console.log(repoData);
+		onRepoData: function(repoData){
+			console.log(repoData);
+		},
+		getData: function(){
+			//... load labels/issues
 		}
 	}
 })
 
 /***/ }),
-/* 8 */
+
+/***/ 89:
+/***/ (function(module, exports) {
+
+Vue.component('labels', {
+	template: `<div><b>Labels:</b>
+					<ul>
+						<li v-on:click="toogle($event)" v-for="label in labels">
+							<span class="label-type">{{label.type}}</span>
+							<ul class = "sub-types">
+								<li class="label-subtype" v-for="subtype in label.subtypes">{{subtype}}</li>
+							</ul>
+						</li>
+					</ul>
+			</div>`,
+	data: function(){
+		return {
+			labels: 
+				[
+					{type: "Bug", subtypes: ["Bug1", "Bug2"]}, 
+					{type: "Feature", subtypes: ["Feature1", "Feature2"]},
+					{type: "SupDvach", subtypes: ["SupDvach1", "SupDvach2"]}
+				]
+		}
+	},
+	methods:{
+		toogle: function(event){
+			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
+	        if (subMenu.classList.contains('selected')) {
+	            subMenu.classList.remove("selected");
+	        } else {
+	            subMenu.classList.add("selected");
+	        }
+	    }
+	}
+})
+
+/***/ }),
+
+/***/ 90:
 /***/ (function(module, exports) {
 
 Vue.component('issues', {
@@ -11219,61 +11248,42 @@ Vue.component('issues', {
 })
 
 /***/ }),
-/* 9 */
+
+/***/ 91:
 /***/ (function(module, exports) {
 
-Vue.component('labels', {
-	template: `<div><b>Labels:</b>
-					<ul>
-						<li v-on:click="toogle($event)" v-for="label in labels">
-							<span class="label-type">{{label.type}}</span>
-							<ul class = "sub-types">
-								<li class="label-subtype" v-for="subtype in label.subtypes">{{subtype}}</li>
-							</ul>
-						</li>
-					</ul>
-			</div>`,
-	data: function(){
-		return {
-			labels: 
-				[
-					{type: "Bug", subtypes: ["Bug1", "Bug2"]}, 
-					{type: "Feature", subtypes: ["Feature1", "Feature2"]},
-					{type: "SupDvach", subtypes: ["SupDvach1", "SupDvach2"]}
-				]
-		}
-	},
-	methods:{
-		toogle: function(event){
-			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
-	        if (subMenu.classList.contains('selected')) {
-	            subMenu.classList.remove("selected");
-	        } else {
-	            subMenu.classList.add("selected");
-	        }
-	    }
-	}
-})
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-new Vue({
-	el: "#app",
+Vue.component('search', {
+	template: `<div id = "search" class = "columns is-centered">
+					<div class = "column is-two-thirds-desktop">
+						<div class = "columns">
+							<div class = "column is-three-quarters">
+								<div class = "control">
+									<input type="text" placeholder="Repository URL" class="input" v-model = "url">
+								</div>
+							</div>
+							<div class = "column is-one-quarter">
+								<div class = "control">
+									<button v-on:click="submit()" id="search-button" class="button is-primary">View</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>`,
 	data: {
-		url: "#"
+		url: ""
 	},
 	methods:{
-		onRepoData: function(repoData){
-			console.log("app.vue");
-			console.log(repoData);
-		},
-		getData: function(){
-			//... load labels/issues
+		submit: function(){
+			var repoData = {};
+			if(!this.url){this.url = "";};
+			var urlArray = this.url.split('/').reverse();
+			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
+			repoData.user = urlArray[1] ? urlArray[1] : "";
+			this.$emit('repodata', repoData);
 		}
 	}
 })
 
 /***/ })
-/******/ ]);
+
+/******/ });
