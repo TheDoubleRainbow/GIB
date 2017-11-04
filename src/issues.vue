@@ -2,7 +2,7 @@ Vue.component('issues', {
 	template: ` <div>
 				<div class="issue" v-for="issue in issues" v-bind:id="'id-'+issue.id"> 
 							<div class="issue-header" @click="openIssue(issue, $event)">
-								<div class="issue-header-status" :style="{background: stateBg(issue.state)}"> {{issue.state}} </div>
+								<div class="issue-header-status" :style="{background: stateBg(issue.state)}"></div>
 								<div class="issue-header-title"> {{issue.title}} </div>
 								<div class="issue-header-url"><a :href="issue.url">View on Github</a></div>
 								<div class="issue-header-labels">
