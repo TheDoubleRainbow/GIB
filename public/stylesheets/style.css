@@ -6175,7 +6175,8 @@ body {
   height: 15px;
   border-radius: 100%; }
 
-.issue-header-url {
+.issue-header-url, .issue-header-pullrequest {
+  font-size: 12px;
   float: right;
   background: #303131;
   padding: 2px 5px 2px 5px;
@@ -6183,8 +6184,12 @@ body {
   border-radius: 6px;
   display: none; }
 
-.issue-header-url a {
+.issue-header-url a, .issue-header-pullrequest a {
   color: white; }
+
+.issue-header-pullrequest {
+  background: #802282;
+  margin-right: 15px; }
 
 .issue-header-title {
   font-weight: bold; }

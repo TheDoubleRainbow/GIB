@@ -10,7 +10,7 @@ html
 			.container
 				search(v-on:repodata = "onRepoData")
 				.columns.is-centered
-					.column.is-3#labels
+					.column.is-2#labels
 						labels(v-bind:repodata="repoData" v-bind:repoavailable="repoAvailable")
 					.column.is-7#issues
 						issues
