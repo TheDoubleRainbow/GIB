@@ -97,6 +97,7 @@ module.exports = g;
 Vue = __webpack_require__(2);
 io = __webpack_require__(6);
 __webpack_require__(7);
+__webpack_require__(13)
 __webpack_require__(8);
 __webpack_require__(9);
 __webpack_require__(10);
@@ -19381,24 +19382,31 @@ Vue.component('chat', {
 /***/ (function(module, exports) {
 
 Vue.component('search', {
-	template: `<div id = "search" class = "columns is-centered">
-					<div class = "column is-two-thirds-desktop">
-						<div class = "columns">
-							<div class = "column is-three-quarters">
-								<div class = "control">
-									<input type="text" placeholder="Repository URL" class="input" v-model = "url">
+	template: `
+				<div>
+					<div id = "search" class = "columns is-centered">
+						<div class = "column is-two-thirds-desktop">
+							<div class = "columns">
+								<div class = "column is-three-quarters">
+									<div class = "control">
+										<input @keyup.enter="submit()" type="text" placeholder="Repository URL" class="input" v-model = "url">
+									</div>
 								</div>
-							</div>
-							<div class = "column is-one-quarter">
-								<div class = "control">
-									<button v-on:click="submit()" id="search-button" class="button is-primary">View</button>
+								<div class = "column is-one-quarter">
+									<div class = "control">
+										<button v-on:click="submit()" id="search-button" class="button is-primary">View</button>
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
+					<reviews :repo="repo"></reviews>
 				</div>`,
 	data: function() {
-		return {url: ""}
+		return {
+			url: "https://github.com/facebook/react",
+			repo: {}
+		}
 	},
 	methods:{
 		submit: function(){
@@ -19407,6 +19415,7 @@ Vue.component('search', {
 			var urlArray = this.url.split('/').reverse();
 			repoData.member = urlArray[1] ? urlArray[1] : "";
 			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
+			this.repo = repoData;
 			this.$emit('repodata', repoData);
 		}
 	}
@@ -19534,6 +19543,13 @@ Vue.component('labels', {
 					  		if(found == false){
 					  			var subtype = typeArray[1] ? typeArray[1] : "";
 					  			that.labels.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
+					  			document.getElementById('search').style.margin = "0px 0px 20px 0px"
+					  			document.getElementById('labels').className = 'column is-2 animated slideInUp'; document.getElementById('labels').style.display = "block";
+					  			document.getElementById('issues').className = 'column is-7 animated slideInUp'; document.getElementById("issues").style.display = "block";
+					  			document.getElementById('reviews').className = 'columns is-centered animated slideInUp'; document.getElementById('reviews').style.display = "flex";
+					  			document.getElementsByTagName('body')[0].style.transitionDuration = '0.3s'; 
+					  			document.getElementsByTagName('body')[0].style.background = 'white';
+					  			console.log('hello')
 					  		}
 						});
 					    //that.labels = ret;
@@ -19600,6 +19616,43 @@ new Vue({
 		},
 		getData: function(){
 			//... load labels/issues
+		}
+	}
+})
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports) {
+
+Vue.component('reviews', {
+	template: `<div id = "reviews" class = "columns is-centered">
+					<div class = "column is-two-thirds-desktop">
+						<div class = "columns is-centered">
+							<div class = "column is-9">
+								You are now looking at {{repo.repo}} repo by {{repo.member}}. This repo has 3 reviews.
+							</div>
+							<div class = "is-1">
+								<div class = "control">
+									<button v-on:click="loadViews()" id="search-button" class="button is-info">Open reviews</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>`,
+	data: function() {
+		return {
+		}
+	},
+	watch: {
+		repo: function(val){
+			this.loadViews()
+		}
+	},
+	props: ["repo"],
+	
+	methods:{
+		loadViews: function(){
+			this.repoData = this.repo
 		}
 	}
 })

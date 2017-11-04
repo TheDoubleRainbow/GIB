@@ -1,22 +1,29 @@
 Vue.component('search', {
-	template: `<div id = "search" class = "columns is-centered">
-					<div class = "column is-two-thirds-desktop">
-						<div class = "columns">
-							<div class = "column is-three-quarters">
-								<div class = "control">
-									<input type="text" placeholder="Repository URL" class="input" v-model = "url">
+	template: `
+				<div>
+					<div id = "search" class = "columns is-centered">
+						<div class = "column is-two-thirds-desktop">
+							<div class = "columns">
+								<div class = "column is-three-quarters">
+									<div class = "control">
+										<input @keyup.enter="submit()" type="text" placeholder="Repository URL" class="input" v-model = "url">
+									</div>
 								</div>
-							</div>
-							<div class = "column is-one-quarter">
-								<div class = "control">
-									<button v-on:click="submit()" id="search-button" class="button is-primary">View</button>
+								<div class = "column is-one-quarter">
+									<div class = "control">
+										<button v-on:click="submit()" id="search-button" class="button is-primary">View</button>
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
+					<reviews :repo="repo"></reviews>
 				</div>`,
 	data: function() {
-		return {url: ""}
+		return {
+			url: "https://github.com/facebook/react",
+			repo: {}
+		}
 	},
 	methods:{
 		submit: function(){
@@ -25,6 +32,7 @@ Vue.component('search', {
 			var urlArray = this.url.split('/').reverse();
 			repoData.member = urlArray[1] ? urlArray[1] : "";
 			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
+			this.repo = repoData;
 			this.$emit('repodata', repoData);
 		}
 	}
