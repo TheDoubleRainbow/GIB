@@ -23,15 +23,13 @@ var server = http.createServer(app);
 var io = require('socket.io')(server);
 
 var chatData = {
-  
+
 }
 io.on('connection', function (socket) { 
   socket.emit('getMessages', "test");
 
   socket.on('getMessages', function(data){ 
-    if(){
-
-    }
+    
   });
 
   socket.on('newTab', function(tab){ 
