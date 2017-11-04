@@ -23,9 +23,10 @@ Vue.component('search', {
 			var repoData = {};
 			if(!this.url){this.url = "";};
 			var urlArray = this.url.split('/').reverse();
-			repoData.member = urlArray[1] ? urlArray[1] : "";
+			repoData.owner = urlArray[1] ? urlArray[1] : "";
 			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
-			this.$emit('repodata', repoData);
+			this.$router.push(`/${repoData.owner}/${repoData.repo}`);
+			//this.$emit('repodata', repoData);
 		}
 	}
 })

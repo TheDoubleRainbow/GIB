@@ -9,11 +9,6 @@ html
 	body
 		#app
 			.container
-				search(v-on:repodata = "onRepoData")
-				.columns.is-centered
+				search
+				router-view
 
-					.column.is-2#labels
-						labels(:repodata="repoData" :repoavailable="repoAvailable")
-
-					.column.is-7#issues
-						issues

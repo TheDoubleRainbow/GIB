@@ -16,6 +16,8 @@ Vue.component('labels', {
 	props:['repodata', 'repoavailable'],
 	watch: {
 			repodata: function(){
+				loops = 1;
+				this.labels = [];
 				this.prepareLabels();
 			}
 	},
@@ -30,9 +32,10 @@ Vue.component('labels', {
 	    },
 	    prepareLabels: function(){
 	    	//var ret = [];
+	    	console.log("labels");
 	    	var that = this;
 			if(this.repoavailable){
-					axios.get(`https://api.github.com/repos/${that.repodata.member}/${that.repodata.repo}/labels?page=${loops}`)
+					axios.get(`https://api.github.com/repos/${that.repodata.owner}/${that.repodata.repo}/labels?page=${loops}`)
 					  .then(function (response){
 					  console.log(response);
 					  	response.data.forEach(function(item, i, arr) {
@@ -53,7 +56,7 @@ Vue.component('labels', {
 						});
 					    //that.labels = ret;
 
-					    console.log(response.data);
+					    //console.log(response.data);
 					    loops++;
 					    if(response.data.length == 30){
 					    	that.prepareLabels();
