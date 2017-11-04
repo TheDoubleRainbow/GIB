@@ -1,22 +1,14 @@
 doctype html
 html
 	head
-		title= title
+		title = title
 		link(rel='stylesheet', href='/stylesheets/style.css')
 		script(src='https://unpkg.com/axios/dist/axios.min.js' defer)
 		script(src='javascripts/bundle.js' defer)
 	body
 		#app
 			.container
-				.columns.is-centered#search
-					.column.is-two-thirds-desktop
-						.columns
-							.column.is-three-quarters
-								.control
-									input(class="input" type="text" placeholder="Repository URL")
-							.column.is-one-quarter
-								.control
-									button(id="search-button" class="button is-primary") View
+				search
 				.columns.is-centered
 					.column.is-3#labels
 						labels
