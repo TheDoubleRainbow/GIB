@@ -96,6 +96,7 @@ module.exports = g;
 
 Vue = __webpack_require__(2);
 __webpack_require__(6);
+__webpack_require__(11);
 __webpack_require__(7);
 __webpack_require__(8);
 __webpack_require__(9);
@@ -11182,6 +11183,8 @@ Vue.component('issues', {
 									</div>
 								</div>
 							</div>
+							<chat :chatid="'chat'+issue.id">
+							</chat>
 				</div></div>`,
 	data: function(){
 		return {
@@ -11203,14 +11206,14 @@ Vue.component('issues', {
 				//.. 
 				issue.html = document.getElementById("id-"+issue.id);
 				issue.html.className = "issue-opened"
-				issue.html.querySelector(".issue-first-message").innerHTML = issue.body; issue.html.querySelector(".issue-body").style.display = "block"; issue.html.querySelector(".issue-header-url").style.display = "block";if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "block"}
+				issue.html.querySelector(".issue-first-message").innerHTML = issue.body; issue.html.querySelector(".issue-body").style.display = "block"; issue.html.querySelector(".issue-header-url").style.display = "block";if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "block"} issue.html.querySelector(".chat-open").style.display = "block";
 						
 			}
 			else{
 				issue.opened = false;
 				issue.html = document.getElementById("id-"+issue.id);
 				issue.html.className = "issue";
-				issue.html.querySelector(".issue-body").style.display = "none"; issue.html.querySelector(".issue-header-url").style.display = "none"; if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "none"}
+				issue.html.querySelector(".issue-body").style.display = "none"; issue.html.querySelector(".issue-header-url").style.display = "none"; if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "none"} issue.html.querySelector(".chat-open").style.display = "none";
 					
 			}
 			
@@ -11313,6 +11316,45 @@ new Vue({
 		},
 		getData: function(){
 			//... load labels/issues
+		}
+	}
+})
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+Vue.component('chat', {
+	template: `
+		<div>
+			<div class="chat-open" @click="openChat()">Open chat</div>
+			<div class="chat-body" :id="chatid">
+				<a @click="closeChat" class="delete chat-close"></a>
+				<div class="chat-display">
+					<div :class="getMessageType(message)" v-for="message in messages">{{message.user + ': ' + message.text}}</div>
+				</div>
+		        <div class="chat-input">
+		          <input type="text" name="input" class="input" id="0">
+		        </div>
+		    </div>
+        </div>
+	`,
+	props: ['chatid'],
+	data: function() {
+		return {
+			messages: [{user: "Vasya", text: "Hello world"}, {user: "Kolya", text: "sdasdsada"}, {user: "me", text: "Hello it's me Mario"}]
+		}
+	},
+	methods:{
+		getMessageType(message){
+			return message.user == "me" ? "chat-message chat-message-byuser" : "chat-message"
+		},
+		openChat(){
+			document.getElementById(this.chatid).style.display = "block"; document.getElementById(this.chatid).style.left = window.innerWidth/2+'';
+
+		},
+		closeChat(){
+			document.getElementById(this.chatid).style.display = "none";
 		}
 	}
 })

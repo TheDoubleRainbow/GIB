@@ -23,6 +23,8 @@ Vue.component('issues', {
 									</div>
 								</div>
 							</div>
+							<chat :chatid="'chat'+issue.id">
+							</chat>
 				</div></div>`,
 	data: function(){
 		return {
@@ -44,14 +46,14 @@ Vue.component('issues', {
 				//.. 
 				issue.html = document.getElementById("id-"+issue.id);
 				issue.html.className = "issue-opened"
-				issue.html.querySelector(".issue-first-message").innerHTML = issue.body; issue.html.querySelector(".issue-body").style.display = "block"; issue.html.querySelector(".issue-header-url").style.display = "block";if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "block"}
+				issue.html.querySelector(".issue-first-message").innerHTML = issue.body; issue.html.querySelector(".issue-body").style.display = "block"; issue.html.querySelector(".issue-header-url").style.display = "block";if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "block"} issue.html.querySelector(".chat-open").style.display = "block";
 						
 			}
 			else{
 				issue.opened = false;
 				issue.html = document.getElementById("id-"+issue.id);
 				issue.html.className = "issue";
-				issue.html.querySelector(".issue-body").style.display = "none"; issue.html.querySelector(".issue-header-url").style.display = "none"; if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "none"}
+				issue.html.querySelector(".issue-body").style.display = "none"; issue.html.querySelector(".issue-header-url").style.display = "none"; if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "none"} issue.html.querySelector(".chat-open").style.display = "none";
 					
 			}
 			
