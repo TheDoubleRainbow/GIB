@@ -29,7 +29,7 @@ Vue.component('chat', {
 
 		},
 		closeChat(){
-			document.getElementById(this.chatid).className = "chat-body animated zoomOutUp"
+			document.getElementById(this.chatid).className = "chat-body animated zoomOut"
 			//document.getElementById(this.chatid).style.display = "none";
 		},
 		sendMessage(){
