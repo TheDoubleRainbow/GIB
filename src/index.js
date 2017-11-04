@@ -1,5 +1,6 @@
 Vue = require("./lib/vue.js");
 require("./api.js");
+require("./chat.vue");
 require("./search.vue");
 require("./issues.vue");
 require("./labels.vue");

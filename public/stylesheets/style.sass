@@ -29,18 +29,22 @@ body
 	width: 15px
 	height: 15px
 	border-radius: 100%
-.issue-header-url
+.issue-header-url, .issue-header-pullrequest, .chat-open
+	font-size: 12px
 	float: right
 	background: #303131
 	padding: 2px 5px 2px 5px
 	color: white
 	border-radius: 6px
 	display: none
-.issue-header-url a
+.issue-header-url a, .issue-header-pullrequest a
 	color: white
+.issue-header-pullrequest
+	background: #802282
+	margin-right: 15px
 .issue-header-title
 	font-weight: bold
-.issue-header
+.issue-header, .issue-header-opened
 	cursor: default
 	margin: 0px 0px 10px 0px
 	transition-duration: 0.4s
@@ -56,13 +60,15 @@ body
 	display: none
 .circle
 	//width: 15px
-	//height: 15px
+	width: 1px
+	height: 25px
 	//border: 2px solid #C4CBC6
 	//background: #A6ACA7
-	border-radius: 100%
+	//border-radius: 100%
 	margin: 0 auto
-	margin-top: 20px
-	margin-bottom: 10px
+	margin-top: 10px
+	margin-bottom: 0px
+	border-left: 2px solid #DDE5DF
 .issue-first-message, .issue-message
 	background: #F2F2F2
 	padding: 5px 10px 5px 10px
@@ -71,5 +77,45 @@ body
 	padding-left: 10px
 	font-size: 12px
 	color: #808480
+// chat
+.chat-body
+	display: none
+	width: 600px
+	position: fixed
+	top: 100px
+	border-radius: 5px
+.chat-display
+	padding: 10px 10px 20px 10px
+	height: 400px
+	width: 600px
+	background: #F7F4F4
+	overflow-y:scroll
+	border-radius: 5px 5px 0px 0px
+	box-shadow: 0px 0px 1px #424242
+.chat-message
+	padding: 5px 10px 5px 10px;
+	background: #42b4ed;
+	border-radius: 20px;
+	float: left;
+	clear: both;
+	margin-top: 10px;
+	color: white;
+	transition-duration: 0.3s;
+.chat-message-byuser
+	background: #c4c4c4;
+	float: right;
+	color: black;
+.chat-open
+	cursor: default
+	float: none
+	margin: 0 auto
+	width: 150px
+	text-align: center
+	margin-top: 20px
+.chat-close
+	position: relative
+	top: 16px
+	right: 10px
 
+// chat end
 
