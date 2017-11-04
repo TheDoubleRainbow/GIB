@@ -11222,7 +11222,7 @@ Vue.component('issues', {
 /***/ (function(module, exports) {
 
 Vue.component('labels', {
-	template: `<div><b>Labels:</b>
+	template: `<div @repoData = "prepareLabels"><b>Labels:</b>
 					<ul>
 						<li v-on:click="toogle($event)" v-for="label in labels">
 							<span class="label-type">{{label.type}}</span>
@@ -11235,13 +11235,19 @@ Vue.component('labels', {
 	data: function(){
 			return {labels: []}
 		},
-	created: function(){
-		this.labels = this.prepareLabels()
-		},
-	props:{
-			repodata: {},
-			repoavailable: false
-		},
+	//created: function(){
+		//console.log(this.repoavailable);
+		//this.labels = this.prepareLabels()
+		//},
+	props:['repodata', 'repoavailable'],
+	watch: {
+			repodata: function(){
+				console.log("watch");
+				//console.log(this.repodata);
+				//this.labels = this.prepareLabels();
+				this.prepareLabels();
+			}
+	},
 	methods:{
 		toogle: function(event){
 			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
@@ -11252,22 +11258,55 @@ Vue.component('labels', {
 	        }
 	    },
 	    prepareLabels: function(){
+	    	//console.log("prepareLabels");
 	    	var ret = [];
+	    	var that = this;
 			if(this.repoavailable){
-				axios.get(`https://api.github.com/repos/${this.repoData.member}/${this.repoData.repo}/labels`)
-				  .then(function (response) {
-				  	response.forEach(function(item, i, arr) {
+				//console.log("repoavailable")
+				axios.get(`https://api.github.com/repos/${that.repodata.member}/${that.repodata.repo}/labels`)
+				  .then(function (response){
+				  	console.log("response");
+				  	console.log(response);
+				  	response.data.forEach(function(item, i, arr) {
+
+				  		console.log("forEach"+i);
+
 				  		var typeArray = item.name.split(": ");
-				  		ret.push({name: item.name, type: typeArray[0], subtype: typeArray[1] ? typeArray[1] : "", color: item.color});
+				  		var found = false;
+
+				  		ret.forEach(function(item1, i1, arr1){
+				  			if(item1.type == typeArray[0]){
+				  				console.log("itemtype = typearr");
+				  				ret[i1].subtypes.push(typeArray[1] ? typeArray[1] : "");
+				  				found = true;
+				  			}
+				  		})
+
+				  		if(found == false){
+				  			console.log("push" + i);
+				  			var subtype = typeArray[1] ? typeArray[1] : "";
+				  			ret.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
+				  		}
+
+				  		
+				  		//ret.push({name: item.name, type: typeArray[0], subtype: typeArray[1] ? typeArray[1] : "", color: item.color});
 					});
-				  	return ret;
-				    console.log(response);
+					console.log("return");
+					console.log(ret);
+				  	//return ret;
+				    that.labels = ret;
 				  })
 				  .catch(function (error) {
-				  	return [];
-				    console.log(error);
+				  	//console.log(error);
+				  	//return [];
+				  	that.labels = [];
+				    
 				  });
-			} else { return [];}; 
+			} else { 
+				//console.log("reponotavailable")
+				//return [];
+				that.labels = []
+			}; 
 
 		/*return {
 			labels: 
@@ -11290,25 +11329,30 @@ new Vue({
 	data: 
 		{
 			repoData: {
-				member: "",
-				repo: ""
+				member: "AAAA",
+				repo: "FFFF"
 			},
 			repoAvailable: false
 		},
 	methods: {
 		onRepoData: function(repoData){
+			var that = this;
 			axios.get(`https://api.github.com/repos/${repoData.member}/${repoData.repo}`)
 				  .then(function (response) {
 				  	//this.labelsData = response;
 				    //console.log(response);
-				    this.rapoData = repoData;
-				    this.rapoAvailable = true;
+				    that.repoData = repoData;
+				    that.repoAvailable = true;
+				    //that.$emit('repodata', that.repoData);
+				    console.log("axios");
+				    console.log(that.repoData);
 				  })
 				  .catch(function (error) {
 				    console.log(error);
-				    this.repoData = {member: "", repo: ""};
-				    this.repoAvailable = false;
+				    that.repoData = {member: "", repo: ""};
+				    that.repoAvailable = false;
 				  });
+
 		},
 		getData: function(){
 			//... load labels/issues

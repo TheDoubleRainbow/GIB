@@ -11,6 +11,6 @@ html
 				search(v-on:repodata = "onRepoData")
 				.columns.is-centered
 					.column.is-3#labels
-						labels(v-bind:repodata="repoData" v-bind:repoavailable="repoAvailable")
+						labels(:repodata="repoData" :repoavailable="repoAvailable")
 					.column.is-7#issues
 						issues

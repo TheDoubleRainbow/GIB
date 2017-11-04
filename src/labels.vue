@@ -1,5 +1,5 @@
 Vue.component('labels', {
-	template: `<div><b>Labels:</b>
+	template: `<div @repoData = "prepareLabels"><b>Labels:</b>
 					<ul>
 						<li v-on:click="toogle($event)" v-for="label in labels">
 							<span class="label-type">{{label.type}}</span>
@@ -12,13 +12,12 @@ Vue.component('labels', {
 	data: function(){
 			return {labels: []}
 		},
-	created: function(){
-		this.labels = this.prepareLabels()
-		},
-	props:{
-			repodata: {},
-			repoavailable: false
-		},
+	props:['repodata', 'repoavailable'],
+	watch: {
+			repodata: function(){
+				this.prepareLabels();
+			}
+	},
 	methods:{
 		toogle: function(event){
 			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
@@ -30,21 +29,35 @@ Vue.component('labels', {
 	    },
 	    prepareLabels: function(){
 	    	var ret = [];
+	    	var that = this;
 			if(this.repoavailable){
-				axios.get(`https://api.github.com/repos/${this.repoData.member}/${this.repoData.repo}/labels`)
-				  .then(function (response) {
-				  	response.forEach(function(item, i, arr) {
+				axios.get(`https://api.github.com/repos/${that.repodata.member}/${that.repodata.repo}/labels`)
+				  .then(function (response){
+				  	response.data.forEach(function(item, i, arr) {
 				  		var typeArray = item.name.split(": ");
-				  		ret.push({name: item.name, type: typeArray[0], subtype: typeArray[1] ? typeArray[1] : "", color: item.color});
+				  		var found = false;
+
+				  		ret.forEach(function(item1, i1, arr1){
+				  			if(item1.type == typeArray[0]){
+				  				ret[i1].subtypes.push(typeArray[1] ? typeArray[1] : "");
+				  				found = true;
+				  			}
+				  		})
+
+				  		if(found == false){
+				  			var subtype = typeArray[1] ? typeArray[1] : "";
+				  			ret.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
+				  		}
 					});
-				  	return ret;
-				    console.log(response);
+				    that.labels = ret;
 				  })
 				  .catch(function (error) {
-				  	return [];
-				    console.log(error);
+				  	that.labels = [];
+				    
 				  });
-			} else { return [];}; 
+			} else { 
+				that.labels = []
+			}; 
 
 		/*return {
 			labels: 
