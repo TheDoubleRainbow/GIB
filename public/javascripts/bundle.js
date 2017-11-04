@@ -11148,13 +11148,13 @@ new Vue({
 
 Vue.component('labels', {
 	template: `<div><b>Labels:</b>
-					<ul>
-						<li v-for="label in labels"> {{label}}</li>
-					</ul>
+					<div class="type" v-for="label in labels"> {{label.name}}
+						<div class="subtype" v-for="subtype in label.subtypes">{{subtype}}</div>
+					</div>
 			</div>`,
 	data: function(){
 		return {
-			labels: ["Bug", "Feature", "SupDvach", "Ya lampovaya Nyasha"]
+			labels: [{name: "bug", subtypes: ["wontfix", "romapidor", "faceisrapgod"]}, {name: "romapidor", subtypes: ["bug"]}, {name: "wontfix", subtypes: ["bug", "romapidor"]}]
 		}
 	}
 })
@@ -11170,6 +11170,7 @@ Vue.component('issues', {
 							<div class="issue-header" @click="openIssue(issue, $event)">
 								<div class="issue-header-status" :style="{background: stateBg(issue.state)}"> {{issue.state}} </div>
 								<div class="issue-header-title"> {{issue.title}} </div>
+								<div class="issue-header-url"><a :href="issue.url">View on Github</a></div>
 								<div class="issue-header-labels">
 									<div class="issue-header-label" v-for="label in issue.labels">
 										<div class="issue-header-label-name" :style="{background: '#'+label.colour}"> {{label.name}} </div>
@@ -11191,20 +11192,20 @@ Vue.component('issues', {
 			return type =='open' ? "#3CCE7D" : "#C8363D"
 		},
 		openIssue: function(issue, event){
-			if(issue.opened == false || issue.opened == undefined){
+			if(issue.opened == false || issue.opened == undefined || event.target.innerHTML == "View on Github"){
 				issue.opened = true;
 				issue.comments = [];
 				//.. load comments
 				issue.html = document.getElementById("id-"+issue.id);
 				issue.html.className = "issue-opened"
-				issue.html.querySelector(".issue-first-message").innerHTML = issue.body; issue.html.querySelector(".issue-first-message").style.display = "block"
+				issue.html.querySelector(".issue-first-message").innerHTML = issue.body; issue.html.querySelector(".issue-first-message").style.display = "block"; issue.html.querySelector(".issue-header-url").style.display = "block"
 						
 			}
 			else{
 				issue.opened = false;
 				issue.html = document.getElementById("id-"+issue.id);
 				issue.html.className = "issue";
-				issue.html.querySelector(".issue-first-message").style.display = "none"
+				issue.html.querySelector(".issue-first-message").style.display = "none"; issue.html.querySelector(".issue-header-url").style.display = "none"
 					
 			}
 			

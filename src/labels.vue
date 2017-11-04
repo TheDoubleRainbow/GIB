@@ -1,12 +1,12 @@
 Vue.component('labels', {
 	template: `<div><b>Labels:</b>
-					<ul>
-						<li v-for="label in labels"> {{label}}</li>
-					</ul>
+					<div class="type" v-for="label in labels"> {{label.name}}
+						<div class="subtype" v-for="subtype in label.subtypes">{{subtype}}</div>
+					</div>
 			</div>`,
 	data: function(){
 		return {
-			labels: ["Bug", "Feature", "SupDvach", "Ya lampovaya Nyasha"]
+			labels: [{name: "bug", subtypes: ["wontfix", "romapidor", "faceisrapgod"]}, {name: "romapidor", subtypes: ["bug"]}, {name: "wontfix", subtypes: ["bug", "romapidor"]}]
 		}
 	}
 })

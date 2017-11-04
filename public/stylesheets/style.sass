@@ -5,10 +5,16 @@ body
 	width: 100%
 #search
 	margin: 0px 0px 60px 0px
-#labels ul
-	margin: 10px 0px 0px 10px
-#labels ul li:hover
+#labels
 	cursor: default
+.type
+	margin: 10px 0px 0px 10px
+.type-hoverable:hover
+	transition-duration: 0.3s
+	color: #3CCE7D
+.subtype
+	margin: 5px 0px 0px 10px
+.subtype:hover
 	transition-duration: 0.3s
 	color: #3CCE7D
 .issue-header .issue-header-status,.issue-header .issue-header-title,.issue-header .issue-header-labels, .issue-header .issue-header-labels *
@@ -17,6 +23,15 @@ body
 .issue-header-status, .issue-header-labels * 
 	padding: 0px 4px 0px 4px
 	border-radius: 5px
+.issue-header-url
+	float: right
+	background: #303131
+	padding: 2px 5px 2px 5px
+	color: white
+	border-radius: 6px
+	display: none
+.issue-header-url a
+	color: white
 .issue-header-title
 	font-weight: bold
 .issue-header
@@ -26,14 +41,15 @@ body
 .issue-header:hover
 	margin-left: 10px
 .issue-opened
-	padding-left: 15px;
-	margin-bottom: 10px;
+	padding-left: 15px
+	margin-bottom: 10px
 	transition-duration: 0.3s
 	border-left: 1px grey solid
+	padding-bottom: 10px
 .issue-first-message
 	display: none
 	background: #F2F2F2
 	padding: 5px 10px 5px 10px
-	border-radius: 20px
+	border-radius: 5px
 
 
