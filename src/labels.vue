@@ -52,6 +52,14 @@ Vue.component('labels', {
 					  		if(found == false){
 					  			var subtype = typeArray[1] ? typeArray[1] : "";
 					  			that.labels.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
+					  			document.getElementById('welcome').style.display = "none";
+					  			document.getElementById('search').style.margin = "0px 0px 20px 0px"
+					  			document.getElementById('labels').className = 'column is-2 animated slideInUp'; document.getElementById('labels').style.display = "block";
+					  			document.getElementById('issues').className = 'column is-7 animated slideInUp'; document.getElementById("issues").style.display = "block";
+					  			document.getElementById('reviews').className = 'columns is-centered animated slideInUp'; document.getElementById('reviews').style.display = "flex";
+					  			document.getElementsByTagName('body')[0].style.transitionDuration = '0.3s'; 
+					  			document.getElementsByTagName('body')[0].style.background = 'white';
+					  			console.log('hello')
 					  		}
 						});
 					    //that.labels = ret;

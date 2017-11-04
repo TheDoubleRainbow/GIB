@@ -6135,17 +6135,57 @@ label.panel-block {
   background-color: whitesmoke;
   padding: 3rem 1.5rem 6rem; }
 
+html {
+  height: 100%; }
+
 body {
-  padding: 20px 0px 0px 0px; }
+  padding: 20px 0px 0px 0px;
+  height: 100%;
+  background: #29A663; }
 
 #search-button {
   width: 100%; }
 
+#labels {
+  display: none; }
+
+#issues {
+  display: none; }
+
 #search {
-  margin: 0px 0px 60px 0px; }
+  margin: 70px 0px 20px 0px;
+  transition-duration: 0.3s; }
 
 #labels ul {
   margin: 10px 0px 0px 10px; }
+
+#welcome {
+  margin-top: 30px;
+  color: white;
+  font-weight: bold;
+  font-size: 45px;
+  text-align: center; }
+
+.review-header {
+  padding-left: 10px;
+  font-size: 12px;
+  color: #808480; }
+
+.review-body {
+  background: #F2F2F2;
+  padding: 5px 10px 5px 10px;
+  border-radius: 5px; }
+
+.review-new-header {
+  padding-left: 10px;
+  font-size: 14px;
+  color: #808480; }
+
+.review-new {
+  margin-top: 20px; }
+
+.review-new-confirm {
+  text-align: center; }
 
 .label-type:hover, .label-subtype:hover {
   transition-duration: 0.3s;
@@ -6159,6 +6199,10 @@ body {
 #labels ul li .sub-types.selected {
   display: block;
   transition: transform .2s; }
+
+#reviews {
+  margin: 0px 0px 40px 0px;
+  display: none; }
 
 .issue-header .issue-header-status, .issue-header .issue-header-title, .issue-header .issue-header-labels, .issue-header .issue-header-labels * {
   display: inline-block;

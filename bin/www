@@ -20,6 +20,23 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+var io = require('socket.io')(server);
+
+var chatData = {
+
+}
+io.on('connection', function (socket) { 
+  socket.emit('getMessages', "test");
+
+  socket.on('getMessages', function(data){ 
+    
+  });
+
+  socket.on('newTab', function(tab){ 
+    //serverData.addTab(tab.tabName);
+    //socket.emit('tabs', serverData.tabs);
+  });
+});
 
 /**
  * Listen on provided port, on all network interfaces.
