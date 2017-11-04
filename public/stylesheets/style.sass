@@ -7,10 +7,15 @@ body
 	margin: 0px 0px 60px 0px
 #labels ul
 	margin: 10px 0px 0px 10px
-#labels ul li:hover
+#labels ul li span:hover
 	cursor: default
 	transition-duration: 0.3s
 	color: #3CCE7D
+#labels ul li .sub-types
+    display: none
+#labels ul li .sub-types.selected
+    display: block
+    transition: transform .2s
 .issue-header .issue-header-status,.issue-header .issue-header-title,.issue-header .issue-header-labels, .issue-header .issue-header-labels *
 	display: inline-block
 	margin: 0px 6px 2px 0px
