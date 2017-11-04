@@ -8,7 +8,7 @@ html
 	body
 		#app
 			.container
-				search
+				search(v-on:repodata = "onRepoData")
 				.columns.is-centered
 					.column.is-3#labels
 						labels

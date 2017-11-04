@@ -11148,8 +11148,8 @@ Vue.component('search', {
 			var urlArray = this.url.split('/').reverse();
 			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
 			repoData.user = urlArray[1] ? urlArray[1] : "";
-			//this.$emit('', repoData);
-			console.log(repoData);
+			this.$emit('repodata', repoData);
+			//console.log(repoData);
 		}
 	}
 })
@@ -11259,13 +11259,16 @@ Vue.component('labels', {
 /* 10 */
 /***/ (function(module, exports) {
 
-
 new Vue({
 	el: "#app",
 	data: {
 		url: "#"
 	},
 	methods:{
+		onRepoData: function(repoData){
+			console.log("app.vue");
+			console.log(repoData);
+		},
 		getData: function(){
 			//... load labels/issues
 		}

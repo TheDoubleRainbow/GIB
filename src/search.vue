@@ -25,8 +25,7 @@ Vue.component('search', {
 			var urlArray = this.url.split('/').reverse();
 			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
 			repoData.user = urlArray[1] ? urlArray[1] : "";
-			//this.$emit('', repoData);
-			console.log(repoData);
+			this.$emit('repodata', repoData);
 		}
 	}
 })
