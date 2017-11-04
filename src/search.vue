@@ -15,16 +15,16 @@ Vue.component('search', {
 						</div>
 					</div>
 				</div>`,
-	data: {
-		url: ""
+	data: function() {
+		return {url: ""}
 	},
 	methods:{
 		submit: function(){
 			var repoData = {};
 			if(!this.url){this.url = "";};
 			var urlArray = this.url.split('/').reverse();
+			repoData.member = urlArray[1] ? urlArray[1] : "";
 			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
-			repoData.user = urlArray[1] ? urlArray[1] : "";
 			this.$emit('repodata', repoData);
 		}
 	}
