@@ -6199,6 +6199,10 @@ body {
   padding-top: 20px;
   margin-bottom: 20px; }
 
+.reviews-none {
+  color: #808480;
+  text-align: center; }
+
 .issue-header .issue-header-status, .issue-header .issue-header-title, .issue-header .issue-header-labels, .issue-header .issue-header-labels * {
   display: inline-block;
   margin: 0px 6px 2px 0px; }

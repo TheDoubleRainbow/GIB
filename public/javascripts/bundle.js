@@ -19688,6 +19688,7 @@ Reviews = Vue.component('reviews', {
 					<div class = "column is-10-widescreen is-10-fullhd is-12-desktop">
 						<div id="reviews-list" class="columns is-centered">
 							<div class="column is-10">
+								<div v-if="reviews.length == 0" class="reviews-none">There're no reviews yet. Feel free to add one.</div>
 								<div class="review" v-for="review in reviews">
 									<div class="review-header">
 										Review by {{review.user}} 
