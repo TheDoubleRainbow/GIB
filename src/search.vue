@@ -18,11 +18,11 @@ Vue.component('search', {
 							</div>
 						</div>
 					</div>
-					<reviews :repo="repo"></reviews>
 				</div>`,
 	data: function() {
 		return {
-			url: "https://github.com/facebook/react",
+			//url: "https://github.com/facebook/react",
+			url: "",
 			repo: {}
 		}
 	},
@@ -34,6 +34,7 @@ Vue.component('search', {
 			repoData.owner = urlArray[1] ? urlArray[1] : "";
 			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
 			this.$router.push(`/${repoData.owner}/${repoData.repo}`);
+			this.url = "";
 			this.repo = repoData;
 		}
 	}

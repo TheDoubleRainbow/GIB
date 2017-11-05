@@ -13,7 +13,7 @@ Vue.component('labels', {
 	data: function(){
 			return {labels: []}
 		},
-	props:['repodata', 'repoavailable'],
+	props:['repodata'],
 	watch: {
 			repodata: function(){
 				loops = 1;
@@ -34,7 +34,7 @@ Vue.component('labels', {
 	    	//var ret = [];
 	    	console.log("labels");
 	    	var that = this;
-			if(this.repoavailable){
+			if(this.repodata.available){
 					axios.get(`https://api.github.com/repos/${that.repodata.owner}/${that.repodata.repo}/labels?page=${loops}`)
 					  .then(function (response){
 					  console.log(response);
@@ -52,7 +52,7 @@ Vue.component('labels', {
 					  		if(found == false){
 					  			var subtype = typeArray[1] ? typeArray[1] : "";
 					  			that.labels.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
-					  			document.getElementById('welcome').style.display = "none";
+					  			/*document.getElementById('welcome').style.display = "none";
 					  			document.getElementById('search').style.margin = "0px 0px 20px 0px"
 					  			document.getElementById('labels').className = 'column is-2 animated slideInUp'; document.getElementById('labels').style.display = "block";
 					  			document.getElementById('issues').className = 'column is-7 animated slideInUp'; document.getElementById("issues").style.display = "block";
@@ -60,6 +60,7 @@ Vue.component('labels', {
 					  			document.getElementsByTagName('body')[0].style.transitionDuration = '0.3s'; 
 					  			document.getElementsByTagName('body')[0].style.background = 'white';
 					  			console.log('hello')
+					  			*/
 					  		}
 						});
 					    //that.labels = ret;

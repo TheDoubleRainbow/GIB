@@ -19342,19 +19342,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 9 */
 /***/ (function(module, exports) {
 
-Vue.component('reviews', {
+Reviews = Vue.component('reviews', {
 	template: `<div id = "reviews" class = "columns is-centered">
 					<div class = "column is-10-widescreen is-10-fullhd is-12-desktop">
-						<div class = "columns is-centered">
-							<div class = "column is-7">
-								You are looking at {{repo.repo}} repo by {{repo.member}}. This repo has 3 reviews.
-							</div>
-							<div class = "is-1">
-								<div class = "control">
-									<button v-on:click="loadViews()" id="search-button" class="button is-info">Open reviews</button>
-								</div>
-							</div>
-						</div>
 						<div id="reviews-list" class="columns is-centered">
 							<div class="column is-10">
 								<div class="review" v-for="review in reviews">
@@ -19379,7 +19369,10 @@ Vue.component('reviews', {
 							</div>
 						</div>
 					</div>
-				</div>`,
+				</div>
+			</div>
+		</div>`,
+		//You are looking at {{repodata.repo}} repo by {{repodata.owner}}. This repo has 3 reviews.
 	data: function() {
 		return {
 			reviews: [
@@ -19390,16 +19383,13 @@ Vue.component('reviews', {
 		}
 	},
 	watch: {
-		repo: function(val){
-			this.loadViews()
-		}
+		//repodata: function(val){
+		//	this.loadViews()
+		//}
 	},
-	props: ["repo"],
+	props: ["repodata"],
 	
 	methods:{
-		loadViews: function(){
-			
-		}
 	}
 })
 
@@ -19478,11 +19468,11 @@ Vue.component('search', {
 							</div>
 						</div>
 					</div>
-					<reviews :repo="repo"></reviews>
 				</div>`,
 	data: function() {
 		return {
-			url: "https://github.com/facebook/react",
+			//url: "https://github.com/facebook/react",
+			url: "",
 			repo: {}
 		}
 	},
@@ -19494,6 +19484,7 @@ Vue.component('search', {
 			repoData.owner = urlArray[1] ? urlArray[1] : "";
 			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
 			this.$router.push(`/${repoData.owner}/${repoData.repo}`);
+			this.url = "";
 			this.repo = repoData;
 		}
 	}
@@ -19585,7 +19576,7 @@ Vue.component('labels', {
 	data: function(){
 			return {labels: []}
 		},
-	props:['repodata', 'repoavailable'],
+	props:['repodata'],
 	watch: {
 			repodata: function(){
 				loops = 1;
@@ -19606,7 +19597,7 @@ Vue.component('labels', {
 	    	//var ret = [];
 	    	console.log("labels");
 	    	var that = this;
-			if(this.repoavailable){
+			if(this.repodata.available){
 					axios.get(`https://api.github.com/repos/${that.repodata.owner}/${that.repodata.repo}/labels?page=${loops}`)
 					  .then(function (response){
 					  console.log(response);
@@ -19624,7 +19615,7 @@ Vue.component('labels', {
 					  		if(found == false){
 					  			var subtype = typeArray[1] ? typeArray[1] : "";
 					  			that.labels.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
-					  			document.getElementById('welcome').style.display = "none";
+					  			/*document.getElementById('welcome').style.display = "none";
 					  			document.getElementById('search').style.margin = "0px 0px 20px 0px"
 					  			document.getElementById('labels').className = 'column is-2 animated slideInUp'; document.getElementById('labels').style.display = "block";
 					  			document.getElementById('issues').className = 'column is-7 animated slideInUp'; document.getElementById("issues").style.display = "block";
@@ -19632,6 +19623,7 @@ Vue.component('labels', {
 					  			document.getElementsByTagName('body')[0].style.transitionDuration = '0.3s'; 
 					  			document.getElementsByTagName('body')[0].style.background = 'white';
 					  			console.log('hello')
+					  			*/
 					  		}
 						});
 					    //that.labels = ret;
@@ -19666,12 +19658,29 @@ Vue.component('labels', {
 /* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
-
 __webpack_require__(15);
+__webpack_require__(16);
+__webpack_require__(9);
 Vue.use(Router)
 const router = new Router({
 	routes: [
-		{ path: '/:owner/:repo', component: Repo}
+		{ path: '/:owner/:repo', component: Repo,
+			children: [
+	        {
+	          path: 'issues',
+	          component: IssuesBlock
+	        },
+	        {
+	          path: 'reviews',
+	          component: Reviews
+	        },
+	        {
+				path: '',
+	        	redirect: 'issues'
+	        }
+	      ]
+      }
+
 	]
 })
 new Vue({
@@ -19693,50 +19702,102 @@ new Vue({
 /***/ (function(module, exports) {
 
 Repo = Vue.component('repo', {
-	template: `<div class = "columns is-centered">
-					<div class = "column.is-2" id = "labels">
-						<labels :repodata="repoData" :repoavailable="repoAvailable" ></labels>
+	template: `<div>	
+					<div class = "columns is-centered">
+						<div class = "column is-7">
+							
+						</div>
+						<div class = "is-1">
+							<div class = "control">
+								<button v-on:click="loadViews()" id="search-button" class="button is-info">Open reviews</button>
+							</div>
+						</div>
 					</div>
-					<div class = "column is-7" id = "issues">
-						<issues></issues>
-					</div>
+
+					<router-view class = "columns is-centered" :repodata = "repoData"></router-view>
 				</div>`,
 	data: function(){
-			return {
-						repoData: {
-							owner: "",
-							repo: ""
-						},
-						repoAvailable: false};
-					},
+		return {
+					repoData: {
+						owner: "",
+						repo: "",
+						available: false,
+					}
+				}
+			},
 	watch: {
-		'$route.params': function(){
-			this.getRepoData();
+
+			'$route.params': function(){
+				this.getRepoData();
+				console.log("repoWatch");
 			}
-	},
+		},
 	created: function(){
 			this.getRepoData();
 			},
-	methods:{
-			getRepoData: function(){
+	methods: {
+		getRepoData: function(){
 			var that = this;
 			axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}`)
 				  .then(function (response) {
 				  	//this.labelsData = response;
 				    //console.log(response);
-				    that.repoData = {owner: that.$route.params.owner, repo:that.$route.params.repo};
-				    that.repoAvailable = true;
+				    that.repoData = {owner: that.$route.params.owner, repo:that.$route.params.repo, available: true};
 				    //that.$emit('repodata', that.repoData);
 				    console.log("axios");
 				    //console.log(that.repoData);
 				  })
 				  .catch(function (error) {
 				    console.log(error);
-				    that.repoData = {owner: "", repo: ""};
-				    that.repoAvailable = false;
+				    that.repoData = {owner: "", repo: "" , available: false};
 				  });
+		},
+		loadViews: function(){
+			this.$router.push(`/${this.repoData.owner}/${this.repoData.repo}/reviews`);
 		}
-	}	
+	}
+})
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports) {
+
+IssuesBlock = Vue.component('issuesblock', {
+	template: `<div>
+					<div class = "column.is-2" id = "labels">
+						<labels :repodata = "repoData" ></labels>
+					</div>
+					<div class = "column is-7" id = "issues">
+						<issues></issues>
+					</div>
+				</div>`,
+	data: function(){
+			/*return {
+						repoData: {
+							owner: "",
+							repo: "",
+							repoAvailable: false
+						}
+					}
+				},*/
+				return {repoData: {}};
+			},
+	props:['repodata'],
+	watch: {
+		repodata: function(){
+			this.repoData = this.repodata;
+			console.log("IssuesBlockWatch");
+			}
+	},
+	created: function(){
+			//this.repoData = this.repodata;
+			}
+	//methods:{
+	//		getRepoData: function(){
+	//	}
+	//}	
+	//<labels :repodata="repoData" :repoavailable="repoAvailable" ></labels>
+	//<issues></issues>
 })
 
 /***/ })

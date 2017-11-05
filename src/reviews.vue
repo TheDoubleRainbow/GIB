@@ -1,16 +1,6 @@
-Vue.component('reviews', {
+Reviews = Vue.component('reviews', {
 	template: `<div id = "reviews" class = "columns is-centered">
 					<div class = "column is-10-widescreen is-10-fullhd is-12-desktop">
-						<div class = "columns is-centered">
-							<div class = "column is-7">
-								You are looking at {{repo.repo}} repo by {{repo.member}}. This repo has 3 reviews.
-							</div>
-							<div class = "is-1">
-								<div class = "control">
-									<button v-on:click="loadViews()" id="search-button" class="button is-info">Open reviews</button>
-								</div>
-							</div>
-						</div>
 						<div id="reviews-list" class="columns is-centered">
 							<div class="column is-10">
 								<div class="review" v-for="review in reviews">
@@ -35,7 +25,10 @@ Vue.component('reviews', {
 							</div>
 						</div>
 					</div>
-				</div>`,
+				</div>
+			</div>
+		</div>`,
+		//You are looking at {{repodata.repo}} repo by {{repodata.owner}}. This repo has 3 reviews.
 	data: function() {
 		return {
 			reviews: [
@@ -46,15 +39,12 @@ Vue.component('reviews', {
 		}
 	},
 	watch: {
-		repo: function(val){
-			this.loadViews()
-		}
+		//repodata: function(val){
+		//	this.loadViews()
+		//}
 	},
-	props: ["repo"],
+	props: ["repodata"],
 	
 	methods:{
-		loadViews: function(){
-			
-		}
 	}
 })
