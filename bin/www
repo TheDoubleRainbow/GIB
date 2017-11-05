@@ -7,6 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('gib:server');
 var http = require('http');
+var MongoClient = require('mongodb').MongoClient;
+var db = {url: "mongodb://gib:qwerty@ds245805.mlab.com:45805/heroku_dt4zfk5h"}
 
 /**
  * Get port from environment and store in Express.
@@ -22,19 +24,43 @@ app.set('port', port);
 var server = http.createServer(app);
 var io = require('socket.io')(server);
 
-var chatData = {
 
+var getMessages = function(data, socket){
+  MongoClient.connect(db.url, (err, db) => {
+    if (err) return console.log(err)
+    db.collection('messages', function (err, collection) {
+          collection.find({repo: data.repo, chat: data.chat}).toArray(function(err, items) {
+              if(err) throw err; 
+              socket.emit("messagesList", items);           
+          });
+        
+      });         
+   })
 }
 io.on('connection', function (socket) { 
-  socket.emit('getMessages', "test");
 
-  socket.on('getMessages', function(data){ 
-    
+  socket.on('getMessages', function(data){
+    getMessages(data, socket)
   });
 
-  socket.on('newTab', function(tab){ 
-    //serverData.addTab(tab.tabName);
-    //socket.emit('tabs', serverData.tabs);
+  socket.on('newMessage', function(message){ 
+    MongoClient.connect(db.url, (err, db) => {
+    if (err) return console.log(err)
+    db.collection('messages').insertOne( {
+        "chat": message.chat,
+        "repo": message.repo,
+        "user": message.user,
+        "text": message.text
+      }, function(err, result) {
+        console.log("New message: " + message.user + ": " + message.text + " to repo: " + message.repo + " to chat: " + message.chat);
+      if(err){
+        res.send(err)
+      }
+      else{
+        getMessages({repo: message.repo, chat: message.chat}, socket)
+      }
+      });        
+    })
   });
 });
 
