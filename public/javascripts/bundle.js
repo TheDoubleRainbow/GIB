@@ -19618,15 +19618,16 @@ Vue.component('reviews', {
 					<div class = "column is-10-widescreen is-10-fullhd is-12-desktop">
 						<div class = "columns is-centered">
 							<div class = "column is-7">
-								You are looking at {{repo.repo}} repo by {{repo.member}}. This repo has 3 reviews.
+								You are looking at {{repo.repo}} repo by {{repo.owner}}. This repo has 3 reviews.
 							</div>
 							<div class = "is-1">
 								<div class = "control">
-									<button v-on:click="loadViews()" id="search-button" class="button is-info">Open reviews</button>
+									<button v-if="!show" v-on:click="show = !show" id="search-button" class="button is-info">Open reviews</button>
+									<button v-if="show" v-on:click="show = !show" id="search-button" class="button is-info">Close reviews</button>
 								</div>
 							</div>
 						</div>
-						<div id="reviews-list" class="columns is-centered">
+						<div v-if="show" id="reviews-list" class="columns is-centered">
 							<div class="column is-10">
 								<div class="review" v-for="review in reviews">
 									<div class="review-header">
@@ -19655,6 +19656,7 @@ Vue.component('reviews', {
 		</div>`,
 	data: function() {
 		return {
+			show: false,
 			reviews: [
 				{id: 0, user: {name: "Vasya"}, text: "What a nice repo, i rly rly rly rly love it"},
 				{id: 1, user: {name: "Facebook"}, text: "This is our repo, normies get out reeeeeeeeê"},
