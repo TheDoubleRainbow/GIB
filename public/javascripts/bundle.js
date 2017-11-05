@@ -19690,10 +19690,12 @@ Reviews = Vue.component('reviews', {
 							<div class="column is-10">
 								<div class="review" v-for="review in reviews">
 									<div class="review-header">
-										Review by {{review.user.name}} 
+										Review by {{review.user}} 
 									</div>
 									<div class="review-body">
-										{{review.text}}
+										<p>
+											{{review.text}}
+										</p>
 									</div>
 								</div>
 								<div class="review-new">
@@ -19701,10 +19703,10 @@ Reviews = Vue.component('reviews', {
 										Write your own review:
 									<div>
 									<div class="review-new-body column is-12">
-										<textarea rows="2" class="textarea"></textarea>
+										<input v-model="reviewText" type="text" class="input" />
 									</div>
 									<div class="review-new-confirm">
-										<button class="button is-primary">Push my review</button>
+										<button @click="addReview" class="button is-primary">Push my review</button>
 									</div>
 								</div>
 							</div>
@@ -19717,11 +19719,8 @@ Reviews = Vue.component('reviews', {
 	data: function() {
 		return {
 			show: false,
-			reviews: [
-				{id: 0, user: {name: "Vasya"}, text: "What a nice repo, i rly rly rly rly love it"},
-				{id: 1, user: {name: "Facebook"}, text: "This is our repo, normies get out reeeeeeeeê"},
-				{id: 2, user: {name: "Kolya"}, text: "Hello world"}
-			]
+			reviews: [],
+			reviewText: ""
 		}
 	},
 	watch: {
@@ -19731,9 +19730,38 @@ Reviews = Vue.component('reviews', {
 	},
 	//props: ["repodata"],
 	
-	methods:{loadIssues: function(){
+	methods:{
+		loadIssues: function(){
 			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/issues`);
+		},
+		getReviews: function(){
+			var that = this;
+			axios.get(`getReviews/${that.$route.params.owner}/${that.$route.params.repo}`)
+				  .then(function (response) {
+				  	that.reviews = response.data;
+				  	console.log(that.reviews[1].text)
+				  })
+				  .catch(function (error) {
+				    console.log(error);
+				  });
+		},
+		addReview: function(){
+			var that = this
+			axios.post('/addReview', {
+				    repo: that.$route.params.owner+"/"+that.$route.params.repo,
+				    user: 'Anon',
+				    text: that.reviewText
+				  })
+				  .then(function (response) {
+				    console.log(response);
+				  })
+				  .catch(function (error) {
+				    console.log(error);
+				  });
 		}
+	},
+	created: function(){
+		this.getReviews()
 	}
 })
 
