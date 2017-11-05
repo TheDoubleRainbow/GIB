@@ -1,7 +1,7 @@
 require("./reponotfound.vue");
 Repo = Vue.component('repo', {
 	template: `<div>	
-					<router-view class="columns is-centered" v-if="repoData.available"></router-view>
+					<router-view v-if="repoData.available"></router-view>
 					<reponotfound class="columns is-centered" v-if="!repoData.available"></reponotfound>
 					
 				</div>`,

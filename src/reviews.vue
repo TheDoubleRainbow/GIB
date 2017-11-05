@@ -41,19 +41,19 @@ Reviews = Vue.component('reviews', {
 			</div>
 		</div>
 	</div>`,*/
-	template: `<div id = "reviews" class = "columns is-centered">
-					<div class = "column is-10-widescreen is-10-fullhd is-12-desktop">
-						<div id="reviews-list" class="columns is-centered">
-							<div class = "columns is-centered">
-								<div class = "column is-7">
-									
-								</div>
-								<div class = "is-1">
+	template: `<div>
+				<div class = "columns is-centered">
+								
+								<div class = "column is-8 is-8-desktop is-12-tablet">
 									<div class = "control">
-										<button v-on:click="loadIssues()" id="search-button" class="button is-info">Open issues</button>
+										<button v-on:click="loadIssues()" id="issues-button" class="button is-info">Back to issues</button>
 									</div>
 								</div>
 							</div>
+
+				<div id = "reviews" class = "columns is-centered">
+					<div class = "column is-10-widescreen is-10-fullhd is-12-desktop">
+						<div id="reviews-list" class="columns is-centered">
 							<div class="column is-10">
 								<div class="review" v-for="review in reviews">
 									<div class="review-header">
