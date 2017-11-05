@@ -32,12 +32,10 @@ Vue.component('labels', {
 	    },
 	    prepareLabels: function(){
 	    	//var ret = [];
-	    	console.log("labels");
 	    	var that = this;
 			if(this.repodata.available){
 					axios.get(`https://api.github.com/repos/${that.repodata.owner}/${that.repodata.repo}/labels?page=${loops}`)
 					  .then(function (response){
-					  console.log(response);
 					  	response.data.forEach(function(item, i, arr) {
 					  		var typeArray = item.name.split(": ");
 					  		var found = false;
