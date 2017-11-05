@@ -70,7 +70,7 @@ Reviews = Vue.component('reviews', {
 										Write your own review:
 									<div>
 									<div class="review-new-body column is-12">
-										<input v-model="reviewText" type="text" class="input" />
+										<input @keyup.enter="addReview" v-model="reviewText" type="text" class="input" />
 									</div>
 									<div class="review-new-confirm">
 										<button @click="addReview" class="button is-primary">Push my review</button>
@@ -120,7 +120,8 @@ Reviews = Vue.component('reviews', {
 				    text: that.reviewText
 				  })
 				  .then(function (response) {
-				    console.log(response);
+				    that.reviewText = "";
+				    that.getReviews();
 				  })
 				  .catch(function (error) {
 				    console.log(error);
