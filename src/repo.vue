@@ -1,16 +1,5 @@
 Repo = Vue.component('repo', {
 	template: `<div>	
-					<div class = "columns is-centered">
-						<div class = "column is-7">
-							
-						</div>
-						<div class = "is-1">
-							<div class = "control">
-								<button v-on:click="loadViews()" id="search-button" class="button is-info">Open reviews</button>
-							</div>
-						</div>
-					</div>
-
 					<router-view class = "columns is-centered" :repodata = "repoData"></router-view>
 				</div>`,
 	data: function(){
@@ -48,9 +37,6 @@ Repo = Vue.component('repo', {
 				    console.log(error);
 				    that.repoData = {owner: "", repo: "" , available: false};
 				  });
-		},
-		loadViews: function(){
-			this.$router.push(`/${this.repoData.owner}/${this.repoData.repo}/reviews`);
 		}
 	}
 })

@@ -44,6 +44,16 @@ Reviews = Vue.component('reviews', {
 	template: `<div id = "reviews" class = "columns is-centered">
 					<div class = "column is-10-widescreen is-10-fullhd is-12-desktop">
 						<div id="reviews-list" class="columns is-centered">
+							<div class = "columns is-centered">
+								<div class = "column is-7">
+									You are now looking at {{repodata.repo}} repo by {{repodata.owner}}. This repo has 3 reviews.
+								</div>
+								<div class = "is-1">
+									<div class = "control">
+										<button v-on:click="loadIssues()" id="search-button" class="button is-info">Open issues</button>
+									</div>
+								</div>
+							</div>
 							<div class="column is-10">
 								<div class="review" v-for="review in reviews">
 									<div class="review-header">
@@ -88,6 +98,8 @@ Reviews = Vue.component('reviews', {
 	},
 	props: ["repodata"],
 	
-	methods:{
+	methods:{loadIssues: function(){
+			this.$router.push(`/${this.repodata.owner}/${this.repodata.repo}/issues`);
+		}
 	}
 })
