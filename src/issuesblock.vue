@@ -35,7 +35,6 @@ IssuesBlock = Vue.component('issuesblock', {
 	watch: {
 		repodata: function(){
 			this.repoData = this.repodata;
-			console.log("IssuesBlockWatch");
 			}
 	},
 	created: function(){
@@ -43,7 +42,7 @@ IssuesBlock = Vue.component('issuesblock', {
 			},
 	methods:{
 		loadViews: function(){
-			this.$router.push(`/${this.repoData.owner}/${this.repoData.repo}/reviews`);
+			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/reviews`);
 		}
 	}
 

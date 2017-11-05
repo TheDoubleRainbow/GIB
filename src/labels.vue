@@ -11,17 +11,19 @@ Vue.component('labels', {
 					</ul>
 			</div>`,
 	data: function(){
-			return {labels: []}
+			return {labels: [],
+					loaded: false}
 		},
 	props:['repodata'],
 	watch: {
-			repodata: function(){
-				loops = 1;
-				this.labels = [];
-				this.prepareLabels();
+			'$route'(to, from ){
+				//this.reset();
 			}
 	},
-	methods:{
+	created: function(){
+		this.reset();
+		},
+	methods: {
 		toogle: function(event){
 			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
 	        if (subMenu.classList.contains('selected')) {
@@ -30,11 +32,19 @@ Vue.component('labels', {
 	            subMenu.classList.add("selected");
 	        }
 	    },
+	    reset: function(){
+	    		loops = 1;
+
+				//this.labels = [];
+				this.prepareLabels();
+				this.loaded = true;
+	    },
 	    prepareLabels: function(){
 	    	//var ret = [];
 	    	var that = this;
-			if(this.repodata.available){
-					axios.get(`https://api.github.com/repos/${that.repodata.owner}/${that.repodata.repo}/labels?page=${loops}`)
+			if(!this.loaded){
+				console.log("load");
+					axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/labels?page=${loops}`)
 					  .then(function (response){
 					  	response.data.forEach(function(item, i, arr) {
 					  		var typeArray = item.name.split(": ");
@@ -63,7 +73,6 @@ Vue.component('labels', {
 						});
 					    //that.labels = ret;
 
-					    //console.log(response.data);
 					    loops++;
 					    if(response.data.length == 30){
 					    	that.prepareLabels();
@@ -71,20 +80,9 @@ Vue.component('labels', {
 					  })
 					  .catch(function (error) {
 					  	that.labels = [];
-					  	//break;
+					  	console.log("error");
 					 });
-			} else { 
-				that.labels = []
-			}; 
-
-		/*return {
-			labels: 
-				[
-					{type: "Bug", subtypes: ["Bug1", "Bug2"]}, 
-					{type: "Feature", subtypes: ["Feature1", "Feature2"]},
-					{type: "SupDvach", subtypes: ["SupDvach1", "SupDvach2"]}
-				]
-		}*/
+			}
 	    }
 	}	
 })

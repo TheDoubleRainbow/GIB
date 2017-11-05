@@ -1,6 +1,9 @@
+require("./reponotfound.vue");
 Repo = Vue.component('repo', {
 	template: `<div>	
-					<router-view class = "columns is-centered" :repodata = "repoData"></router-view>
+					<router-view class="columns is-centered" v-if="repoData.available"></router-view>
+					<reponotfound class="columns is-centered" v-if="!repoData.available"></reponotfound>
+					
 				</div>`,
 	data: function(){
 		return {
@@ -15,7 +18,6 @@ Repo = Vue.component('repo', {
 
 			'$route.params': function(){
 				this.getRepoData();
-				console.log("repoWatch");
 			}
 		},
 	created: function(){
@@ -26,12 +28,7 @@ Repo = Vue.component('repo', {
 			var that = this;
 			axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}`)
 				  .then(function (response) {
-				  	//this.labelsData = response;
-				    //console.log(response);
 				    that.repoData = {owner: that.$route.params.owner, repo:that.$route.params.repo, available: true};
-				    //that.$emit('repodata', that.repoData);
-				    console.log("axios");
-				    //console.log(that.repoData);
 				  })
 				  .catch(function (error) {
 				    console.log(error);

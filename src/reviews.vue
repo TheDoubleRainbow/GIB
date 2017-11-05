@@ -4,7 +4,7 @@ Reviews = Vue.component('reviews', {
 						<div id="reviews-list" class="columns is-centered">
 						<div class = "columns is-centered">
 							<div class = "column is-7">
-
+									You are now looking at {{repodata.repo}} repo by {{repodata.owner}}. This repo has 3 reviews.
 							</div>
 							<div class = "is-1">
 								<div class = "control">
@@ -46,7 +46,7 @@ Reviews = Vue.component('reviews', {
 						<div id="reviews-list" class="columns is-centered">
 							<div class = "columns is-centered">
 								<div class = "column is-7">
-									You are now looking at {{repodata.repo}} repo by {{repodata.owner}}. This repo has 3 reviews.
+									
 								</div>
 								<div class = "is-1">
 									<div class = "control">
@@ -96,10 +96,10 @@ Reviews = Vue.component('reviews', {
 		//	this.loadViews()
 		//}
 	},
-	props: ["repodata"],
+	//props: ["repodata"],
 	
 	methods:{loadIssues: function(){
-			this.$router.push(`/${this.repodata.owner}/${this.repodata.repo}/issues`);
+			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/issues`);
 		}
 	}
 })

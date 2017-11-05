@@ -100,7 +100,7 @@ Reviews = Vue.component('reviews', {
 						<div id="reviews-list" class="columns is-centered">
 						<div class = "columns is-centered">
 							<div class = "column is-7">
-
+									You are now looking at {{repodata.repo}} repo by {{repodata.owner}}. This repo has 3 reviews.
 							</div>
 							<div class = "is-1">
 								<div class = "control">
@@ -142,7 +142,7 @@ Reviews = Vue.component('reviews', {
 						<div id="reviews-list" class="columns is-centered">
 							<div class = "columns is-centered">
 								<div class = "column is-7">
-									You are now looking at {{repodata.repo}} repo by {{repodata.owner}}. This repo has 3 reviews.
+									
 								</div>
 								<div class = "is-1">
 									<div class = "control">
@@ -192,10 +192,10 @@ Reviews = Vue.component('reviews', {
 		//	this.loadViews()
 		//}
 	},
-	props: ["repodata"],
+	//props: ["repodata"],
 	
 	methods:{loadIssues: function(){
-			this.$router.push(`/${this.repodata.owner}/${this.repodata.repo}/issues`);
+			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/issues`);
 		}
 	}
 })
@@ -19506,7 +19506,6 @@ Vue.component('chat', {
 Vue.component('search', {
 	template: `
 				<div>
-					<div id="welcome">Welcome to GIB</div>
 					<div id = "search" class = "columns is-centered">
 						<div class = "column is-two-thirds-desktop">
 							<div class = "columns">
@@ -19629,17 +19628,19 @@ Vue.component('labels', {
 					</ul>
 			</div>`,
 	data: function(){
-			return {labels: []}
+			return {labels: [],
+					loaded: false}
 		},
 	props:['repodata'],
 	watch: {
-			repodata: function(){
-				loops = 1;
-				this.labels = [];
-				this.prepareLabels();
+			'$route'(to, from ){
+				//this.reset();
 			}
 	},
-	methods:{
+	created: function(){
+		this.reset();
+		},
+	methods: {
 		toogle: function(event){
 			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
 	        if (subMenu.classList.contains('selected')) {
@@ -19648,11 +19649,19 @@ Vue.component('labels', {
 	            subMenu.classList.add("selected");
 	        }
 	    },
+	    reset: function(){
+	    		loops = 1;
+
+				//this.labels = [];
+				this.prepareLabels();
+				this.loaded = true;
+	    },
 	    prepareLabels: function(){
 	    	//var ret = [];
 	    	var that = this;
-			if(this.repodata.available){
-					axios.get(`https://api.github.com/repos/${that.repodata.owner}/${that.repodata.repo}/labels?page=${loops}`)
+			if(!this.loaded){
+				console.log("load");
+					axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/labels?page=${loops}`)
 					  .then(function (response){
 					  	response.data.forEach(function(item, i, arr) {
 					  		var typeArray = item.name.split(": ");
@@ -19681,7 +19690,6 @@ Vue.component('labels', {
 						});
 					    //that.labels = ret;
 
-					    //console.log(response.data);
 					    loops++;
 					    if(response.data.length == 30){
 					    	that.prepareLabels();
@@ -19689,20 +19697,9 @@ Vue.component('labels', {
 					  })
 					  .catch(function (error) {
 					  	that.labels = [];
-					  	//break;
+					  	console.log("error");
 					 });
-			} else { 
-				that.labels = []
-			}; 
-
-		/*return {
-			labels: 
-				[
-					{type: "Bug", subtypes: ["Bug1", "Bug2"]}, 
-					{type: "Feature", subtypes: ["Feature1", "Feature2"]},
-					{type: "SupDvach", subtypes: ["SupDvach1", "SupDvach2"]}
-				]
-		}*/
+			}
 	    }
 	}	
 })
@@ -19717,7 +19714,8 @@ __webpack_require__(1);
 Vue.use(Router)
 const router = new Router({
 	routes: [
-		{ path: '/:owner/:repo', component: Repo,
+		{ path: '/', component: {template: `<div><div id="welcome">Welcome to GIB</div> <search></search></div>`}},
+		{ path: '/:owner/:repo', component: {template: `<div><search></search><repo></repo></div>`},
 			children: [
 	        {
 	          path: 'issues',
@@ -19752,11 +19750,14 @@ new Vue({
 
 /***/ }),
 /* 15 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
+__webpack_require__(17);
 Repo = Vue.component('repo', {
 	template: `<div>	
-					<router-view class = "columns is-centered" :repodata = "repoData"></router-view>
+					<router-view class="columns is-centered" v-if="repoData.available"></router-view>
+					<reponotfound class="columns is-centered" v-if="!repoData.available"></reponotfound>
+					
 				</div>`,
 	data: function(){
 		return {
@@ -19771,7 +19772,6 @@ Repo = Vue.component('repo', {
 
 			'$route.params': function(){
 				this.getRepoData();
-				console.log("repoWatch");
 			}
 		},
 	created: function(){
@@ -19782,12 +19782,7 @@ Repo = Vue.component('repo', {
 			var that = this;
 			axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}`)
 				  .then(function (response) {
-				  	//this.labelsData = response;
-				    //console.log(response);
 				    that.repoData = {owner: that.$route.params.owner, repo:that.$route.params.repo, available: true};
-				    //that.$emit('repodata', that.repoData);
-				    console.log("axios");
-				    //console.log(that.repoData);
 				  })
 				  .catch(function (error) {
 				    console.log(error);
@@ -19838,7 +19833,6 @@ IssuesBlock = Vue.component('issuesblock', {
 	watch: {
 		repodata: function(){
 			this.repoData = this.repodata;
-			console.log("IssuesBlockWatch");
 			}
 	},
 	created: function(){
@@ -19846,10 +19840,20 @@ IssuesBlock = Vue.component('issuesblock', {
 			},
 	methods:{
 		loadViews: function(){
-			this.$router.push(`/${this.repoData.owner}/${this.repoData.repo}/reviews`);
+			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/reviews`);
 		}
 	}
 
+})
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports) {
+
+Vue.component('reponotfound', {
+	template: `<div>
+				REPO {{$route.params.repo}} BY {{$route.params.owner}} NOT FOUND
+				</div>`,
 })
 
 /***/ })

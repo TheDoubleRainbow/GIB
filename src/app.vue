@@ -4,7 +4,8 @@ require("./reviews.vue");
 Vue.use(Router)
 const router = new Router({
 	routes: [
-		{ path: '/:owner/:repo', component: Repo,
+		{ path: '/', component: {template: `<div><div id="welcome">Welcome to GIB</div> <search></search></div>`}},
+		{ path: '/:owner/:repo', component: {template: `<div><search></search><repo></repo></div>`},
 			children: [
 	        {
 	          path: 'issues',
