@@ -3,7 +3,7 @@ IssuesBlock = Vue.component('issuesblock', {
 
 					<div class = "columns is-centered">
 						<div id="reviews-greeting" class = "column is-6-desktop is-8-tablet">
-							You are looking at {{$route.params.owner}}\`s {{$route.params.repo}} repo. It has N reviews
+							You are looking at {{$route.params.owner}}\`s {{$route.params.repo}} repo. {{reviewsAmount}}
 						</div>
 						<div class = "column is-2-desktop is-3-tablet">
 							<div class = "control">
@@ -23,7 +23,52 @@ IssuesBlock = Vue.component('issuesblock', {
 				</div>`,
 	beforeRouteUpdate (to, from, next) {
 	  	},
+	data: function(){
+			/*return {
+						repoData: {
+							owner: "",
+							repo: "",
+							repoAvailable: false
+						}
+					}
+				},*/
+				return {
+					repoData: {},
+					reviewsAmount: ""
+				};
+			},
+	props:['repodata'],
+	watch: {
+		repodata: function(){
+			this.repoData = this.repodata;
+			}
+	},
+	created: function(){
+			//this.repoData = this.repodata;
+			this.getReviewsAmount()
+			},
 	methods:{
+		getReviewsAmount: function(){
+			var that = this;
+			axios.get(`getReviews/${that.$route.params.owner}/${that.$route.params.repo}`)
+				  .then(function (response) {
+				  	var revAmount = response.data.length;
+				  	let answer = "It has ";
+				  	if(revAmount == 0){
+				  		answer += "no reviews";
+				  	}
+				  	else if(revAmount == 1){
+				  		answer += revAmount + " review";
+				  	}
+				  	else{
+				  		answer += revAmount + " reviews";
+				  	}
+				  	that.reviewsAmount = answer;
+				  })
+				  .catch(function (error) {
+				    console.log(error);
+				  });
+		},
 		loadViews: function(){
 			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/reviews`);
 		}
