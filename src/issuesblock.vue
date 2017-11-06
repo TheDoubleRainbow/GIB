@@ -1,7 +1,7 @@
 IssuesBlock = Vue.component('issuesblock', {
 	template: `<div>
 
-					<div class = "columns is-centered">
+					<div class = "columns is-centered animated pulse">
 						<div id="reviews-greeting" class = "column is-6-desktop is-8-tablet">
 							You are looking at {{$route.params.owner}}\`s {{$route.params.repo}} repo. {{reviewsAmount}}
 						</div>
@@ -12,7 +12,7 @@ IssuesBlock = Vue.component('issuesblock', {
 						</div>
 					</div>
 
-					<div class = "columns is-centered">
+					<div class = "columns is-centered animated pulse">
 						<div class = "column.is-2" id = "labels">
 							<labels :repodata = "repoData" ></labels>
 						</div>

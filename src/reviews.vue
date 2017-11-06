@@ -57,7 +57,7 @@ Reviews = Vue.component('reviews', {
 							<div class="column is-10">
 								<div class="loading-div" v-if="!loaded"><img class="loading-img" src="/img/loading.gif" /></div>
 								<div v-if="reviews.length == 0 && loaded" class="reviews-none">There're no reviews yet. Feel free to add one.</div>
-								<div class="review" v-for="review in reviews">
+								<div class="review animated pulse" v-for="review in reviews">
 									<div class="review-header">
 										Review by {{review.user}} 
 									</div>
