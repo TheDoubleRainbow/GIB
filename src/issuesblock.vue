@@ -14,33 +14,15 @@ IssuesBlock = Vue.component('issuesblock', {
 
 					<div class = "columns is-centered">
 						<div class = "column.is-2" id = "labels">
-							<labels :repodata = "repoData" ></labels>
+							<labels></labels>
 						</div>
 						<div class = "column is-7" id = "issues">
 							<issues></issues>
 						</div>
 					</div>
 				</div>`,
-	data: function(){
-			/*return {
-						repoData: {
-							owner: "",
-							repo: "",
-							repoAvailable: false
-						}
-					}
-				},*/
-				return {repoData: {}};
-			},
-	props:['repodata'],
-	watch: {
-		repodata: function(){
-			this.repoData = this.repodata;
-			}
-	},
-	created: function(){
-			//this.repoData = this.repodata;
-			},
+	beforeRouteUpdate (to, from, next) {
+	  	},
 	methods:{
 		loadViews: function(){
 			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/reviews`);

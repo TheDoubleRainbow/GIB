@@ -32,6 +32,7 @@ Vue.component('search', {
 			var urlArray = this.url.split('/').reverse();
 			repoData.owner = urlArray[1] ? urlArray[1] : "";
 			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
+			this.$router.push('/');
 			this.$router.push(`/${repoData.owner}/${repoData.repo}`);
 			this.url = "";
 			this.repo = repoData;

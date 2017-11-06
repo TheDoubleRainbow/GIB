@@ -1,3 +1,4 @@
+require("./store.js");
 require("./repo.vue");
 require("./issuesblock.vue");
 require("./reviews.vue");
@@ -24,9 +25,10 @@ const router = new Router({
 
 	]
 })
-new Vue({
+app = new Vue({
 	//render: h => h(App),
 	router: router,
+	store: store,
 	el: "#app",
 	data: 
 		{
