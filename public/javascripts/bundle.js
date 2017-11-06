@@ -19512,7 +19512,7 @@ Vue.component('labels', {
 					<ul>
 						<li v-on:click="toogle($event)" v-for="label in labels">
 							<span class="label-type">{{label.type}}</span>
-							<ul class = "sub-types">
+							<ul v-if="checkSubtypes(label.subtypes)" class = "sub-types">
 								<li class="label-subtype" v-for="subtype in label.subtypes">{{subtype}}</li>
 							</ul>
 						</li>
@@ -19534,11 +19534,13 @@ Vue.component('labels', {
 	methods: {
 		toogle: function(event){
 			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
-	        if (subMenu.classList.contains('selected')) {
-	            subMenu.classList.remove("selected");
-	        } else {
-	            subMenu.classList.add("selected");
-	        }
+			if(subMenu != undefined){
+				if (subMenu.classList.contains('selected')) {
+		            subMenu.classList.remove("selected");
+		        } else {
+		            subMenu.classList.add("selected");
+		        }
+			}
 	    },
 	    reset: function(){
 	    		loops = 1;
@@ -19546,6 +19548,13 @@ Vue.component('labels', {
 				//this.labels = [];
 				this.prepareLabels();
 				this.loaded = true;
+	    },
+	    checkSubtypes: function(sub){
+	    	let ret = true
+	    	if(sub[0] == ""){
+	    		ret = false
+	    	}
+	    	return ret
 	    },
 	    prepareLabels: function(){
 	    	//var ret = [];
