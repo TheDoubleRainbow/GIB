@@ -19709,7 +19709,8 @@ Reviews = Vue.component('reviews', {
 					<div class = "column is-10-widescreen is-10-fullhd is-12-desktop">
 						<div id="reviews-list" class="columns is-centered">
 							<div class="column is-10">
-								<div v-if="reviews.length == 0" class="reviews-none">There're no reviews yet. Feel free to add one.</div>
+								<div class="loading-div" v-if="!loaded"><img class="loading-img" src="/img/loading.gif" /></div>
+								<div v-if="reviews.length == 0 && loaded" class="reviews-none">There're no reviews yet. Feel free to add one.</div>
 								<div class="review" v-for="review in reviews">
 									<div class="review-header">
 										Review by {{review.user}} 
@@ -19740,6 +19741,7 @@ Reviews = Vue.component('reviews', {
 	</div>`,
 	data: function() {
 		return {
+			loaded: false,
 			show: false,
 			reviews: [],
 			reviewText: ""
@@ -19761,7 +19763,8 @@ Reviews = Vue.component('reviews', {
 			axios.get(`getReviews/${that.$route.params.owner}/${that.$route.params.repo}`)
 				  .then(function (response) {
 				  	that.reviews = response.data;
-				  	console.log(that.reviews[1].text)
+				  	
+				  	that.loaded = true;
 				  })
 				  .catch(function (error) {
 				    console.log(error);

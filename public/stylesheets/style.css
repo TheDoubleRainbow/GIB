@@ -6199,6 +6199,13 @@ body {
   padding-top: 20px;
   margin-bottom: 20px; }
 
+.loading-img {
+  width: 120px;
+  height: auto; }
+
+.loading-div {
+  text-align: center; }
+
 .reviews-none {
   color: #808480;
   text-align: center; }
