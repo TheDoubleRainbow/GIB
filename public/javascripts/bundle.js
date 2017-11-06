@@ -36616,10 +36616,11 @@ __webpack_require__(95);
 __webpack_require__(97);
 __webpack_require__(99);
 __webpack_require__(35);
+__webpack_require__(100);
 Vue.use(Router)
 const router = new Router({
 	routes: [
-		{ path: '/', component: {template: `<div><div id="welcome">Welcome to GIB</div> <search></search></div>`}},
+		{ path: '/', component: Start},
 		{ path: '/:owner/:repo', component: {template: `<div><search></search><repo></repo></div>`},
 			children: [
 	        {
@@ -36661,10 +36662,14 @@ app = new Vue({
 Vuex = __webpack_require__(96);
 store = new Vuex.Store({
     state: {
+        userData: {token: user_data.token, auth: user_data.auth, login: "", avatar: ""},
         repoData: {owner: "", repo: "", available: false, changed: false},
-        labels: []
+        labels: [],
     },
     actions: {
+        setUserData({commit}, userData){
+            commit('SET_USERDATA', userData);
+        },
         setRepoData({commit}, repoData){
             commit('SET_REPODATA', repoData);
         },
@@ -36705,7 +36710,10 @@ store = new Vuex.Store({
             commit('SET_LABELS', labels);
         }
     },
-    mutations: {        
+    mutations: {     
+        SET_USERDATA(state, userData){
+            state.userData = userData;
+        },   
         SET_REPODATA(state, repoData) {
             state.repoData = repoData;
         },
@@ -36714,6 +36722,9 @@ store = new Vuex.Store({
         }
     },
     getters: {
+        userData(state){
+            return state.userData;
+        },
         repoData(state){
             return state.repoData;
         },
@@ -36891,6 +36902,29 @@ IssuesBlock = Vue.component('issuesblock', {
 	}
 
 })
+
+/***/ }),
+/* 100 */
+/***/ (function(module, exports) {
+
+Start = Repo = Vue.component('start', {
+	template: `<div>
+					<div v-if="userData.auth">
+						<div id="welcome">Welcome to GIB</div> 
+						<search></search>
+					</div>
+					<div v-if="userData.auth == false">
+						<a href = "http://github.com/login/oauth/authorize?client_id=f343de2cdd05ffd0d470">GITHUB</a>
+					</div>
+				</div>`,
+	computed: {
+	    	userData: function () {
+	      		return this.$store.getters.userData;
+	      		//return [];
+	    	}
+  	}
+
+});
 
 /***/ })
 /******/ ]);

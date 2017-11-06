@@ -2,10 +2,11 @@ require("./store.js");
 require("./repo.vue");
 require("./issuesblock.vue");
 require("./reviews.vue");
+require("./start.vue");
 Vue.use(Router)
 const router = new Router({
 	routes: [
-		{ path: '/', component: {template: `<div><div id="welcome">Welcome to GIB</div> <search></search></div>`}},
+		{ path: '/', component: Start},
 		{ path: '/:owner/:repo', component: {template: `<div><search></search><repo></repo></div>`},
 			children: [
 	        {

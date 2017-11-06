@@ -10,13 +10,22 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
-
+var session = require('express-session');
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(session({
+  //genid: function(req) {
+   // return genuuid();
+  //},
+  secret: 'GIBITREV',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false }
+}));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));

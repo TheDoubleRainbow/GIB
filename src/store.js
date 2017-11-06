@@ -1,10 +1,14 @@
 Vuex = require("./lib/vuex.min.js");
 store = new Vuex.Store({
     state: {
+        userData: {token: user_data.token, auth: user_data.auth, login: "", avatar: ""},
         repoData: {owner: "", repo: "", available: false, changed: false},
-        labels: []
+        labels: [],
     },
     actions: {
+        setUserData({commit}, userData){
+            commit('SET_USERDATA', userData);
+        },
         setRepoData({commit}, repoData){
             commit('SET_REPODATA', repoData);
         },
@@ -45,7 +49,10 @@ store = new Vuex.Store({
             commit('SET_LABELS', labels);
         }
     },
-    mutations: {        
+    mutations: {     
+        SET_USERDATA(state, userData){
+            state.userData = userData;
+        },   
         SET_REPODATA(state, repoData) {
             state.repoData = repoData;
         },
@@ -54,6 +61,9 @@ store = new Vuex.Store({
         }
     },
     getters: {
+        userData(state){
+            return state.userData;
+        },
         repoData(state){
             return state.repoData;
         },
