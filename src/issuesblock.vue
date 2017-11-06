@@ -3,11 +3,16 @@ IssuesBlock = Vue.component('issuesblock', {
 
 					<div class = "columns is-centered animated pulse">
 						<div id="reviews-greeting" class = "column is-6-desktop is-8-tablet">
-							You are looking at {{$route.params.owner}}\`s {{$route.params.repo}} repo. {{reviewsAmount}}
+							You are looking at <span id="reviews-reponame">{{$route.params.owner}}/{{$route.params.repo}}</span> repo. {{reviewsAmount}}
 						</div>
-						<div class = "column is-2-desktop is-3-tablet">
+						<div class = "column is-1-desktop is-2-tablet">
 							<div class = "control">
-								<button v-on:click="loadViews()" id="reviews-button" class="button is-info">Open reviews</button>
+								<button v-on:click="loadViews()" id="reviews-button" class="button is-info">Reviews</button>
+							</div>
+						</div>
+						<div class = "column is-1-desktop is-2-tablet">
+							<div class = "control">
+								<button v-on:click="loadRepodata()" id="repodata-button" class="button is-info">Repo data</button>
 							</div>
 						</div>
 					</div>
@@ -71,6 +76,9 @@ IssuesBlock = Vue.component('issuesblock', {
 		},
 		loadViews: function(){
 			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/reviews`);
+		},
+		loadRepodata: function(){
+			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/repodata`);
 		}
 	}
 

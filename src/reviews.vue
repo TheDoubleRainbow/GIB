@@ -72,7 +72,7 @@ Reviews = Vue.component('reviews', {
 										Write your own review:
 									<div>
 									<div class="review-new-body column is-12">
-										<input @keyup.enter="addReview" v-model="reviewText" type="text" class="input" />
+										<input placeholder="Your review" @keyup.enter="addReview" v-model="reviewText" type="text" class="input" />
 									</div>
 									<div class="review-new-confirm">
 										<button @click="addReview" class="button is-primary">Push my review</button>

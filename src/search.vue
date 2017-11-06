@@ -2,7 +2,7 @@ Vue.component('search', {
 	template: `
 				<div>
 					<div id = "search" class = "columns is-centered">
-						<div class = "column is-two-thirds-desktop">
+						<div class = "column is-8-fullhd is-8-widescreen is-10-desktop">
 							<div class = "columns">
 								<div class = "column is-three-quarters">
 									<div class = "control">
