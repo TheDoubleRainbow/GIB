@@ -5,7 +5,7 @@ Repo = Vue.component('repo', {
 					<reponotfound class="columns is-centered" v-if="!repoData.available"></reponotfound>
 					
 				</div>`,
-	data: function(){
+	/*data: function(){
 		return {
 					repoData: {
 						owner: "",
@@ -13,27 +13,45 @@ Repo = Vue.component('repo', {
 						available: false,
 					}
 				}
-			},
-	watch: {
-
-			'$route.params': function(){
-				this.getRepoData();
-			}
-		},
+			},*/
+	//beforeRouteUpdate (to, from, next) {
+	//  	},
+	//watch()
 	created: function(){
 			this.getRepoData();
-			},
+		},
+	updated: function() {
+			this.getRepoData();
+		},
+	computed: {
+	    	repoData: function () {
+	      		return this.$store.getters.repoData;
+	    	}
+  		},
+
 	methods: {
 		getRepoData: function(){
+			var changed = false;
 			var that = this;
-			axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}`)
-				  .then(function (response) {
-				    that.repoData = {owner: that.$route.params.owner, repo:that.$route.params.repo, available: true};
-				  })
-				  .catch(function (error) {
-				    console.log(error);
-				    that.repoData = {owner: "", repo: "" , available: false};
-				  });
+			if(that.$route.params.owner != that.$store.getters.repoData.owner || that.$route.params.repo != that.$store.getters.repoData.repo){
+				   	changed = true;
+				    	//console.log("changed");    
+				console.log("getRepoData");
+
+				axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}`)
+					  .then(function (response) {
+					  	console.log("axios");
+					    
+					    
+					   // }
+					    that.$store.dispatch('setRepoData', {owner: that.$route.params.owner, repo:that.$route.params.repo, available: true, changed: changed});
+
+					  })
+					  .catch(function (error) {
+					    console.log(error);
+					    //that.$store.dispatch('setRepoData', {owner: "", repo: "", available: false, changed: false});
+					  });
+			}
 		}
 	}
 })

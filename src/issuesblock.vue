@@ -14,13 +14,15 @@ IssuesBlock = Vue.component('issuesblock', {
 
 					<div class = "columns is-centered animated pulse">
 						<div class = "column.is-2" id = "labels">
-							<labels :repodata = "repoData" ></labels>
+							<labels></labels>
 						</div>
 						<div class = "column is-7" id = "issues">
 							<issues></issues>
 						</div>
 					</div>
 				</div>`,
+	beforeRouteUpdate (to, from, next) {
+	  	},
 	data: function(){
 			/*return {
 						repoData: {
