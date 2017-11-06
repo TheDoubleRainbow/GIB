@@ -6256,6 +6256,10 @@ body {
 .loading-div {
   text-align: center; }
 
+.loading-div-repodata {
+  text-align: center;
+  margin-top: 60px; }
+
 .reviews-none {
   color: #808480;
   text-align: center; }

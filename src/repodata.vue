@@ -8,16 +8,17 @@ Repodata = Vue.component('repodata', {
 							</div>
 					</div>
 				</div>
-
-				<div id = "reviews" class = "columns is-centered">
+				<div class="loading-div-repodata" v-if="loaded!=2"><img class="loading-img" src="/img/loading.gif" /></div>
+				<div v-if="loaded==2" id = "reviews" class = "columns is-centered">
 					<div class = "column is-4-widescreen is-4-fullhd is-5-desktop">
 						<div :class="getFIRatioType()">
 							<div v-if="showFI">
-							<div class="fi-header">FI Ratio: {{fiRatio}}% ({{fitype}})</div>
+							<div v-if="enoughfi" class="fi-header">FI Ratio: {{fiRatio}}% ({{fitype}})</div>
 							<div class="fi-body">
-								<div>Usualy it takes {{fidata.average}} days to integrate feature for this repository.</div>
+								<div v-if="!enoughfi"> Not enough data</div>
+								<div v-if="enoughfi">Usualy it takes {{fidata.average}} days to integrate feature for this repository.</div>
 							</div> 
-							<div class="fi-footer">
+							<div v-if="enoughfi" class="fi-footer">
 								<div class="fi-issue">Fastest issue: {{fidata.best}}</div><div class="fi-issue fi-issue-worst">Longest issue: {{fidata.worst}}</div>
 							</div>
 							</div>
@@ -26,11 +27,12 @@ Repodata = Vue.component('repodata', {
 					<div class = "column is-4-widescreen is-4-fullhd is-5-desktop">
 						<div :class="getDFRatioType()">
 							<div v-if="showDF">
-							<div class="fi-header">DF Ratio: {{dfRatio}}% ({{dftype}})</div>
+							<div v-if="enoughdf" class="fi-header">DF Ratio: {{dfRatio}}% ({{dftype}})</div>
 							<div class="fi-body">
-								<div>Usualy it takes {{dfdata.average}} days to fix bug for this repository.</div>
+								<div v-if="!enoughdf"> Not enough data</div>
+								<div v-if="enoughdf">Usualy it takes {{dfdata.average}} days to fix bug for this repository.</div>
 							</div> 
-							<div class="fi-footer">
+							<div v-if="enoughdf" class="fi-footer">
 								<div class="fi-issue">Fastest issue: {{dfdata.best}}</div><div class="fi-issue fi-issue-worst">Longest issue: {{dfdata.worst}}</div>
 							</div>
 							</div>
@@ -40,7 +42,7 @@ Repodata = Vue.component('repodata', {
 			</div></div></div>`,
 	data: function() {
 		return {
-			loaded: false,
+			loaded: 0,
 			showFI: false,
 			showDF: false,
 			fidata: {
@@ -50,14 +52,16 @@ Repodata = Vue.component('repodata', {
 				average: 0
 			},
 			fiRatio: 0,
+			enoughfi: false,
 			fitype: "",
 			dfdata: {
-				data: [0, 0, 1, 2, 0, 1, 0, 0, 0, 0],
+				data: [],
 				worst: 450,
 				best: 1,
 				average: 0
 			},
 			dfRatio: 0,
+			enoughdf: false,
 			dftype: ""
 		}
 	},
@@ -129,8 +133,8 @@ Repodata = Vue.component('repodata', {
 				this.dfRatio += this.dfdata.data[i]
 			}
 			this.dfRatio = this.dfRatio/this.dfdata.data.length;
-			this.dfdata.average = this.dfRatio;
-			this.dfRatio = 100 - parseInt((this.dfRatio/this.dfdata.worst)*100)
+			this.dfdata.average = this.dfRatio.toFixed(3);
+			this.dfRatio = 100 - ((this.dfRatio/this.dfdata.worst)*100).toFixed(2)
 			this.showDF = true;
 		},
 		getDFRatioType: function(){
@@ -180,6 +184,7 @@ Repodata = Vue.component('repodata', {
 			return dif
 		},
 		getData: function(){
+			this.loaded = 0;
 			var that = this;
 			axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/issues?state=closed`)
 	                      .then(function (response){
@@ -187,7 +192,11 @@ Repodata = Vue.component('repodata', {
 	                        	that.fidata.data.push(that.getDif(item.closed_at, item.created_at));
 	                        });
 	                        that.calcFIRatio();
-
+	                        if(that.fidata.data.length > 5){
+	                        	that.enoughfi = true;
+	                        }
+	                        that.loaded++
+	                        console.log(that.loaded)
 	                      })
 	                      .catch(function (error) {
 	                        console.log("error");
@@ -198,11 +207,16 @@ Repodata = Vue.component('repodata', {
 	                        	that.dfdata.data.push(that.getDif(item.closed_at, item.created_at));
 	                        });
 	                        that.calcDFRatio();
-
+	                        if(that.dfdata.data.length > 5){
+	                        	that.enoughdf = true;
+	                        }
+	                        that.loaded++
+	                        console.log(that.loaded)
 	                      })
 	                      .catch(function (error) {
 	                        console.log("error");
 	                     });
+
 		}
 	},
 	created: function(){
