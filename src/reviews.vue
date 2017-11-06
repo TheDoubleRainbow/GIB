@@ -57,7 +57,7 @@ Reviews = Vue.component('reviews', {
 							<div class="column is-10">
 								<div class="loading-div" v-if="!loaded"><img class="loading-img" src="/img/loading.gif" /></div>
 								<div v-if="reviews.length == 0 && loaded" class="reviews-none">There're no reviews yet. Feel free to add one.</div>
-								<div class="review" v-for="review in reviews">
+								<div class="review animated pulse" v-for="review in reviews">
 									<div class="review-header">
 										Review by {{review.user}} 
 									</div>
@@ -72,7 +72,7 @@ Reviews = Vue.component('reviews', {
 										Write your own review:
 									<div>
 									<div class="review-new-body column is-12">
-										<input @keyup.enter="addReview" v-model="reviewText" type="text" class="input" />
+										<input placeholder="Your review" @keyup.enter="addReview" v-model="reviewText" type="text" class="input" />
 									</div>
 									<div class="review-new-confirm">
 										<button @click="addReview" class="button is-primary">Push my review</button>

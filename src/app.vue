@@ -3,6 +3,7 @@ require("./repo.vue");
 require("./issuesblock.vue");
 require("./reviews.vue");
 require("./start.vue");
+require("./repodata.vue")
 Vue.use(Router)
 const router = new Router({
 	routes: [
@@ -18,8 +19,12 @@ const router = new Router({
 	          component: Reviews
 	        },
 	        {
-				path: '',
-	        	redirect: 'issues'
+	          path: 'repodata',
+	          component: Repodata
+	        },
+	        {
+			  path: '',
+	          redirect: 'issues'
 	        }
 	      ]
       }

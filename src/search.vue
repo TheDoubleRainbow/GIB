@@ -2,7 +2,7 @@ Vue.component('search', {
 	template: `
 				<div>
 					<div id = "search" class = "columns is-centered">
-						<div class = "column is-two-thirds-desktop">
+						<div class = "column is-8-fullhd is-8-widescreen is-10-desktop">
 							<div class = "columns">
 								<div class = "column is-three-quarters">
 									<div class = "control">
@@ -32,10 +32,12 @@ Vue.component('search', {
 			var urlArray = this.url.split('/').reverse();
 			repoData.owner = urlArray[1] ? urlArray[1] : "";
 			repoData.repo = urlArray[0] ? urlArray[0].split(".")[0] : "";
-			this.$router.push('/');
-			this.$router.push(`/${repoData.owner}/${repoData.repo}`);
-			this.url = "";
-			this.repo = repoData;
+			if(repoData.repo != "" || repoData.owner != ""){
+				this.$router.push('/');
+				this.$router.push(`/${repoData.owner}/${repoData.repo}`);
+				this.url = "";
+				this.repo = repoData;
+			}
 		}
 	}
 })
