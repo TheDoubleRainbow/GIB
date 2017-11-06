@@ -233,7 +233,7 @@ Repodata = Vue.component('repodata', {
 			showFI: false,
 			showDF: false,
 			fidata: {
-				data: [190, 20, 55, 1, 1, 4, 2, 5, 80, 110],
+				data: [],
 				worst: 190,
 				best: 1,
 				average: 0
@@ -241,7 +241,7 @@ Repodata = Vue.component('repodata', {
 			fiRatio: 0,
 			fitype: "",
 			dfdata: {
-				data: [450, 20, 55, 1, 1, 4, 2, 5, 80, 110],
+				data: [0, 0, 1, 2, 0, 1, 0, 0, 0, 0],
 				worst: 450,
 				best: 1,
 				average: 0
@@ -255,13 +255,25 @@ Repodata = Vue.component('repodata', {
 			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/issues`);
 		},
 		calcFIRatio: function(){
+			let worst = 0;
+			let best = 999999999;
+			for(var i = 0; i < this.fidata.data.length; i++){
+				if(worst < this.fidata.data[i]){
+					worst = this.fidata.data[i]
+				}
+				if(best > this.fidata.data[i]){
+					best = this.fidata.data[i]
+				}
+			}
+			this.fidata.best = best;
+			this.fidata.worst = worst;
 			this.fiRatio = 0;
 			for (var i = 0; i < this.fidata.data.length; i++) {
 				this.fiRatio += this.fidata.data[i]
 			}
 			this.fiRatio = this.fiRatio/this.fidata.data.length;
-			this.fidata.average = this.fiRatio;
-			this.fiRatio = 100 - parseInt((this.fiRatio/this.fidata.worst)*100)
+			this.fidata.average = this.fiRatio.toFixed(3);
+			this.fiRatio = 100 - (this.fiRatio/this.fidata.worst).toFixed(3)*100
 			this.showFI = true;
 		},
 		getFIRatioType: function(){
@@ -289,6 +301,18 @@ Repodata = Vue.component('repodata', {
 			return fitype += " firatio"
 		},
 		calcDFRatio: function(){
+			let worst = 0;
+			let best = 999999999;
+			for(var i = 0; i < this.dfdata.data.length; i++){
+				if(worst < this.dfdata.data[i]){
+					worst = this.dfdata.data[i]
+				}
+				if(best > this.dfdata.data[i]){
+					best = this.dfdata.data[i]
+				}
+			}
+			this.dfdata.best = best;
+			this.dfdata.worst = worst;
 			this.dfRatio = 0;
 			for (var i = 0; i < this.dfdata.data.length; i++) {
 				this.dfRatio += this.dfdata.data[i]
@@ -321,11 +345,59 @@ Repodata = Vue.component('repodata', {
 				this.dftype = "awesome";
 			}
 			return dftype += " firatio"
+		},
+		getDif(raw1, raw2){
+			var dif = 0;
+			var d = {}; var d2 = {};
+			d.raw = raw1
+			d2.raw = raw2
+			d.year = d.raw.split("-")[0]*1;
+			d.month = d.raw.split("-")[1]*1;
+			d.day = (d.raw.split("-")[2][0]+d.raw.split("-")[2][1])*1;
+			d2.year = d2.raw.split("-")[0]*1;
+			d2.month = d2.raw.split("-")[1]*1;
+			d2.day = (d2.raw.split("-")[2][0]+d2.raw.split("-")[2][1])*1;
+			if(d.day-d2.day != 0){
+				dif += d.day-d2.day;
+				if(d.month - d2.month != 0){
+					dif += (d.month-d2.month)*30;
+					if(d.year-d2.year != 0){
+						dif += (d.year - d2.year)*365;
+					}
+				}
+			}
+			return dif
+		},
+		getData: function(){
+			var that = this;
+			axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/issues?state=closed`)
+	                      .then(function (response){
+	                        response.data.forEach(function(item, i, arr) {
+	                        	that.fidata.data.push(that.getDif(item.closed_at, item.created_at));
+	                        });
+	                        that.calcFIRatio();
+
+	                      })
+	                      .catch(function (error) {
+	                        console.log("error");
+	                     });
+	        axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/issues?labels=Type:%20bug&&state=closed`)
+	                      .then(function (response){
+	                        response.data.forEach(function(item, i, arr) {
+	                        	that.dfdata.data.push(that.getDif(item.closed_at, item.created_at));
+	                        });
+	                        that.calcDFRatio();
+
+	                      })
+	                      .catch(function (error) {
+	                        console.log("error");
+	                     });
 		}
 	},
 	created: function(){
-		this.calcFIRatio()
-		this.calcDFRatio()
+		this.calcFIRatio();
+		this.calcDFRatio();
+		this.getData();
 	}
 })
 
