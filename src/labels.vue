@@ -3,7 +3,7 @@ Vue.component('labels', {
 	template: `<div><b>Labels:</b>
 					<ul>
 						<li v-on:click="toogle($event, typeindex)" v-for="(label, typeindex) in labels">
-							<span class="label-type">{{label.type}}</span><span :class="$store.getters.labels[typeindex].selected ? 'switcherM' : 'switcherP'">{{$store.getters.labels[typeindex].selected ? '-' : '+'}}</span>
+							<span class="label-type">{{label.type}}</span><span v-on:click="selectLabel(typeindex)" :class="$store.getters.labels[typeindex].selected ? 'switcherM' : 'switcherP'">{{$store.getters.labels[typeindex].selected ? '-' : '+'}}</span>
 							<ul v-if="label.subtypes.length" class = "sub-types">
 								<li class="label-subtype" v-for="(subtype, subtypeindex) in label.subtypes" v-on:click="selectSubLabel(typeindex, subtypeindex)">
 									{{subtype.subtype}}
@@ -15,67 +15,10 @@ Vue.component('labels', {
 			</div>`,
 	methods: {
 		toogle: function(event, typeindex){
-			/*var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
-			if(subMenu != undefined){
-				if(event.target.className[0] == "s"){
-					if(this.$store.getters.labels[typeindex].selected == undefined){
-						this.$store.getters.labels[typeindex].selected = true
-					}
-					else{
-						this.$store.getters.labels[typeindex].selected = !this.$store.getters.labels[typeindex].selected
-					}
-					for(var i = 0; i < this.$store.getters.labels[typeindex].subtypes.length; i++){
-						this.$store.getters.labels[typeindex].subtypes[i].selected = !this.$store.getters.labels[typeindex].subtypes[i].selected
-					}
-
-					//console.log(this.$store.getters.labels);
-					this.route();
-				}
-				else{
-					if (subMenu.classList.contains('selected')) {
-			            subMenu.classList.remove("selected");
-			        } else {
-			            subMenu.classList.add("selected");
-			        }
-				}
-			}
-			else{
-				//Request for empty sebtypes
-				if(this.$store.getters.labels[typeindex].selected == undefined){
-						this.$store.getters.labels[typeindex].selected = true
-					}
-					else{
-						this.$store.getters.labels[typeindex].selected = !this.$store.getters.labels[typeindex].selected
-					}
-					for(var i = 0; i < this.$store.getters.labels[typeindex].subtypes.length; i++){
-						this.$store.getters.labels[typeindex].subtypes[i].selected = !this.$store.getters.labels[typeindex].subtypes[i].selected
-					}
-
-					//console.log(this.$store.getters.labels);
-					this.route();
-				
-
-			}*/
-
-
 			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
 			if(subMenu != undefined){
 				if(event.target.className[0] == "s"){
-					//if(this.$store.getters.labels[typeindex].selected == undefined){
-					//	this.$store.getters.labels[typeindex].selected = true
-					//}
-					//else{
-					//	this.$store.getters.labels[typeindex].selected = !this.$store.getters.labels[typeindex].selected
-					//}
-					//for(var i = 0; i < this.$store.getters.labels[typeindex].subtypes.length; i++){
-					//	this.$store.getters.labels[typeindex].subtypes[i].selected = !this.$store.getters.labels[typeindex].subtypes[i].selected
-					//}
 
-					//console.log(this.$store.getters.labels);
-					var selected = !this.selected(typeindex, -1);
-	    			this.$store.dispatch('selectLabel', {typeIndex: typeindex, subTypeIndex: subtypeindex, selected});
-
-					this.route();
 				}
 				else{
 					if (subMenu.classList.contains('selected')) {
@@ -86,13 +29,6 @@ Vue.component('labels', {
 				}
 			}
 			else{
-
-				//var selected = !this.selected(typeindex, -1);
-	    		///	this.$store.dispatch('selectLabel', {typeIndex: typeindex, subTypeIndex: -1, selected});
-
-					//this.route();
-
-
 			}
 
 
@@ -103,6 +39,12 @@ Vue.component('labels', {
 
 	    	//console.log(this.$router.)
 	    	this.route();
+	    },
+	    selectLabel(typeIndex){
+	    	var selected = !this.selected(typeIndex, -1);
+	    	this.$store.dispatch('selectLabel', {typeIndex: typeIndex, subTypeIndex: -1, selected});
+
+			this.route();
 	    },
 
 	    route: function(){
