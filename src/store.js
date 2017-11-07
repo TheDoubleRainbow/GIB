@@ -33,7 +33,7 @@ store = new Vuex.Store({
                             })
                             if(found == false){
                                 var subtype = typeArray[1];// ? typeArray[1];
-                                labels.push({name: item.name, type: typeArray[0], subtypes: subtype ? [{subtype: subtype, selected: false}] : [], color: item.color});
+                                labels.push({name: item.name, type: typeArray[0], subtypes: subtype ? [{subtype: subtype, selected: false}] : [], color: item.color, selected: false});
                             }
                         });
                         loops++;
@@ -68,7 +68,14 @@ store = new Vuex.Store({
         },
         SELECT_LABEL(state, {typeIndex, subTypeIndex, selected}){
             //console.log("ti " +typeIndex + " sti " + subTypeIndex + " value " + selected);
-            state.labels[typeIndex].subtypes[subTypeIndex].selected = selected;
+            if(subTypeIndex < 0){
+                state.labels[typeIndex].selected = selected;
+                for(var i = 0; i < state.labels[typeIndex].subtypes.length; i++){
+                    state.labels[typeIndex].subtypes[i].selected = selected;
+                }
+            } else{
+                state.labels[typeIndex].subtypes[subTypeIndex].selected = selected;
+            }
             //console.log(value);
         }
     },
