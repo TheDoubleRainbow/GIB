@@ -73,7 +73,7 @@ Vue.component('labels', {
 
 					//console.log(this.$store.getters.labels);
 					var selected = !this.selected(typeindex, -1);
-	    			this.$store.dispatch('selectLabel', {typeIndex: typeindex, subTypeIndex: -1, selected});
+	    			this.$store.dispatch('selectLabel', {typeIndex: typeindex, subTypeIndex: subtypeindex, selected});
 
 					this.route();
 				}
@@ -87,10 +87,10 @@ Vue.component('labels', {
 			}
 			else{
 
-				var selected = !this.selected(typeindex, -1);
-	    			this.$store.dispatch('selectLabel', {typeIndex: typeindex, subTypeIndex: -1, selected});
+				//var selected = !this.selected(typeindex, -1);
+	    		///	this.$store.dispatch('selectLabel', {typeIndex: typeindex, subTypeIndex: -1, selected});
 
-					this.route();
+					//this.route();
 
 
 			}
