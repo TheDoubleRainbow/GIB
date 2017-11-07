@@ -2,7 +2,7 @@
 
 Heroku:<br />
 https://gib-itrev.herokuapp.com/#/ <br />
-note: pls use heroku becouse github oauth supports only one redirect link and it's set to heroku<br />
+note: pls use heroku because github oauth supports only one redirect link and it's set to heroku<br />
 
 How to start:<br />
   - Step 1:<br />
