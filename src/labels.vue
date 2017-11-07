@@ -2,26 +2,42 @@ var loops = 1;
 Vue.component('labels', {
 	template: `<div><b>Labels:</b>
 					<ul>
-						<li v-on:click="toogle($event)" v-for="(label, typeindex) in labels">
-							<span class="label-type">{{label.type}}</span>
+						<li v-on:click="toogle($event, typeindex)" v-for="(label, typeindex) in labels">
+							<span class="label-type">{{label.type}}</span><span v-if="$store.getters.labels[typeindex].subtypes.length != 0" :class="$store.getters.labels[typeindex].selected ? 'switcherM' : 'switcherP'">{{$store.getters.labels[typeindex].selected ? '-' : '+'}}</span>
 							<ul v-if="label.subtypes.length" class = "sub-types">
 								<li class="label-subtype" v-for="(subtype, subtypeindex) in label.subtypes" v-on:click="selectSubLabel(typeindex, subtypeindex)">
 									{{subtype.subtype}}
-									<span> {{selected(typeindex, subtypeindex) ? '-' : '+'}} </span>
+									<span :class="selected(typeindex, subtypeindex) ? 'switcherM' : 'switcherP'"> {{selected(typeindex, subtypeindex) ? '-' : '+'}} </span>
 								</li>
 							</ul>
 						</li>
 					</ul>
 			</div>`,
 	methods: {
-		toogle: function(event){
+		toogle: function(event, typeindex){
 			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
 			if(subMenu != undefined){
-				if (subMenu.classList.contains('selected')) {
-		            subMenu.classList.remove("selected");
-		        } else {
-		            subMenu.classList.add("selected");
-		        }
+				if(event.target.className[0] == "s"){
+					if(this.$store.getters.labels[typeindex].selected == undefined){
+						this.$store.getters.labels[typeindex].selected = true
+					}
+					else{
+						this.$store.getters.labels[typeindex].selected = !this.$store.getters.labels[typeindex].selected
+					}
+					for(var i = 0; i < this.$store.getters.labels[typeindex].subtypes.length; i++){
+						this.$store.getters.labels[typeindex].subtypes[i].selected = !this.$store.getters.labels[typeindex].subtypes[i].selected
+					}
+				}
+				else{
+					if (subMenu.classList.contains('selected')) {
+			            subMenu.classList.remove("selected");
+			        } else {
+			            subMenu.classList.add("selected");
+			        }
+				}
+			}
+			else{
+				//Request for empty sebtypes
 			}
 	    },
 	    selectSubLabel(typeIndex, subTypeIndex){

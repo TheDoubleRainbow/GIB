@@ -6404,4 +6404,20 @@ body {
   top: 16px;
   right: 10px; }
 
+.switcherP, .switcherM {
+  color: white;
+  border-radius: 100%;
+  margin-left: 5px; }
+
+.switcherP {
+  background: #43EE7F;
+  padding: 0px 5px 2px 5px; }
+
+.switcherM {
+  background: #E62F1E;
+  padding: 0px 6px 2px 6px; }
+
+.label-subtype span {
+  transition-duration: 0.1s; }
+
 /*# sourceMappingURL=style.css.map */
