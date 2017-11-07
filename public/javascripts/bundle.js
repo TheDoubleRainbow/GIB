@@ -19694,6 +19694,11 @@ Vue.component('labels', {
 					for(var i = 0; i < this.$store.getters.labels[typeindex].subtypes.length; i++){
 						this.$store.getters.labels[typeindex].subtypes[i].selected = !this.$store.getters.labels[typeindex].subtypes[i].selected
 					}
+					if (subMenu.classList.contains('selected')) {
+			            
+			        } else {
+			            subMenu.classList.add("selected");
+			        }
 				}
 				else{
 					if (subMenu.classList.contains('selected')) {
