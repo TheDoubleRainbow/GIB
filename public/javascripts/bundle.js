@@ -19604,16 +19604,18 @@ Vue.component('issues', {
 							<div class="issue-header" @click="openIssue(issue, $event)">
 								<div class="issue-header-status" :style="{background: stateBg(issue.state)}"></div>
 								<div class="issue-header-title"> {{issue.title}} </div>
-								<div class="issue-header-url"><a :href="issue.url">View on Github</a></div>
-								<div class="issue-header-pullrequest" v-if="issue.pullrequest"><a :href="issue.pullrequest.url">View pull request</a></div>
+								<div class="issue-header-url"><a :href="'http://github.com/'+$store.getters.repoData.owner+'/'+$store.getters.repoData.repo+'/pull/'+issue.url.split('issues')[1]">View on Github</a></div>
+
+								<div class="issue-header-pullrequest" v-if="issue.pullrequest"><a :href="'http://github.com/'+$store.getters.repoData.owner+'/'+$store.getters.repoData.repo+'/pull/'+issue.pullrequest.url.split('pulls')[1]">View pull request</a></div>
 								<div class="issue-header-labels">
+
 									<div class="issue-header-label" v-for="label in issue.labels">
 										<div class="issue-header-label-name" :style="{background: '#'+label.color}"> {{label.name}} </div>
 									</div>
 								</div>
 							</div>
 							<div class="issue-body">
-								<div class="issue-message-posted-by">Posted by {{issue.user.name}}</div>
+								<div class="issue-message-posted-by">Created by <a :href="'https://github.com/' + issue.user.name"><img :src="issue.user.avatar" />{{issue.user.name}}</a></div>
 								<div class="issue-message issue-first-message"></div>
 								<div class="issue-messages">
 									<div class issue-message-wrap v-for="message in issue.messages">
