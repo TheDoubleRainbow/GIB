@@ -155,7 +155,7 @@ Reviews = Vue.component('reviews', {
 								<div v-if="reviews.length == 0 && loaded" class="reviews-none">There're no reviews yet. Feel free to add one.</div>
 								<div class="review animated pulse" v-for="review in reviews">
 									<div class="review-header">
-										Review by {{review.user}} 
+										Review by <a :href="'https://github.com/'+review.user"><img :src="review.avatar" />{{review.user}} </a>
 									</div>
 									<div class="review-body">
 										<p>
@@ -216,7 +216,8 @@ Reviews = Vue.component('reviews', {
 			var that = this
 			axios.post('/addReview', {
 				    repo: that.$route.params.owner+"/"+that.$route.params.repo,
-				    user: this.$store.getters.userData.login ,
+				    user: this.$store.getters.userData.login,
+				    avatar: this.$store.getters.userData.avatar,
 				    text: that.reviewText
 				  })
 				  .then(function (response) {
@@ -19494,7 +19495,7 @@ Vue.component('chat', {
 				<a @click="closeChat" class="delete chat-close"></a>
 				<div class="chat-display">
 					<div v-if="messages.length == 0" class="messages-none">This chat has no messages.</div>
-					<div :class="getMessageType(message)" v-for="message in messages">{{message.user + ': ' + message.text}}</div>
+					<div :class="getMessageType(message)" v-for="message in messages"><a :href="'https://github.com/' + message.user"><img class="chatavatar" :src="message.avatar" /></a><div><a class="message-url" :href="'https://github.com/' + message.user">{{message.user}}</a>{{': ' + message.text}}</div></div>
 				</div>
 		        <div class="chat-input">
 		          <input @keyup.enter="sendMessage" v-model="input" type="text" placeholder="Enter your message" name="input" class="input messages-input" />
@@ -19537,7 +19538,7 @@ Vue.component('chat', {
 					that.messages = messages;
 					document.getElementById(that.chatid).querySelector(".chat-display").scrollTop = 999999;
 				});
-				socket.emit("newMessage", {user: this.$store.getters.userData.login, text: this.input, repo: this.$route.params.owner+"/"+this.$route.params.repo, chat: this.chatid})
+				socket.emit("newMessage", {user: this.$store.getters.userData.login, avatar: this.$store.getters.userData.avatar, text: this.input, repo: this.$route.params.owner+"/"+this.$route.params.repo, chat: this.chatid})
 				//this.messages.push({user: "Me", text: this.input})
 				this.input = ""
 			}

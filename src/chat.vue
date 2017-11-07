@@ -6,7 +6,7 @@ Vue.component('chat', {
 				<a @click="closeChat" class="delete chat-close"></a>
 				<div class="chat-display">
 					<div v-if="messages.length == 0" class="messages-none">This chat has no messages.</div>
-					<div :class="getMessageType(message)" v-for="message in messages">{{message.user + ': ' + message.text}}</div>
+					<div :class="getMessageType(message)" v-for="message in messages"><a :href="'https://github.com/' + message.user"><img class="chatavatar" :src="message.avatar" /></a><div><a class="message-url" :href="'https://github.com/' + message.user">{{message.user}}</a>{{': ' + message.text}}</div></div>
 				</div>
 		        <div class="chat-input">
 		          <input @keyup.enter="sendMessage" v-model="input" type="text" placeholder="Enter your message" name="input" class="input messages-input" />
@@ -49,7 +49,7 @@ Vue.component('chat', {
 					that.messages = messages;
 					document.getElementById(that.chatid).querySelector(".chat-display").scrollTop = 999999;
 				});
-				socket.emit("newMessage", {user: this.$store.getters.userData.login, text: this.input, repo: this.$route.params.owner+"/"+this.$route.params.repo, chat: this.chatid})
+				socket.emit("newMessage", {user: this.$store.getters.userData.login, avatar: this.$store.getters.userData.avatar, text: this.input, repo: this.$route.params.owner+"/"+this.$route.params.repo, chat: this.chatid})
 				//this.messages.push({user: "Me", text: this.input})
 				this.input = ""
 			}

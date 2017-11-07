@@ -59,7 +59,8 @@ io.on('connection', function (socket) {
         "chat": message.chat,
         "repo": message.repo,
         "user": message.user,
-        "text": message.text
+        "text": message.text,
+        "avatar": message.avatar
       }, function(err, result) {
         console.log("New message: " + message.user + ": " + message.text + " to repo: " + message.repo + " to chat: " + message.chat);
       if(err){

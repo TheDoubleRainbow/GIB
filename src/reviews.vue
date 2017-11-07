@@ -59,7 +59,7 @@ Reviews = Vue.component('reviews', {
 								<div v-if="reviews.length == 0 && loaded" class="reviews-none">There're no reviews yet. Feel free to add one.</div>
 								<div class="review animated pulse" v-for="review in reviews">
 									<div class="review-header">
-										Review by {{review.user}} 
+										Review by <a :href="'https://github.com/'+review.user"><img :src="review.avatar" />{{review.user}} </a>
 									</div>
 									<div class="review-body">
 										<p>
@@ -120,7 +120,8 @@ Reviews = Vue.component('reviews', {
 			var that = this
 			axios.post('/addReview', {
 				    repo: that.$route.params.owner+"/"+that.$route.params.repo,
-				    user: this.$store.getters.userData.login ,
+				    user: this.$store.getters.userData.login,
+				    avatar: this.$store.getters.userData.avatar,
 				    text: that.reviewText
 				  })
 				  .then(function (response) {
