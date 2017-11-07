@@ -14,6 +14,7 @@ store = new Vuex.Store({
             commit('SET_REPODATA', repoData);
         },
         loadLabels({commit}, repoData) {
+                //var labels = [{name: "NoLabled", type: "NoLabled", subtypes: [], color: ""}];
                 var labels = [];
                 var loops = 1;
                 load();
@@ -24,19 +25,19 @@ store = new Vuex.Store({
                         response.data.forEach(function(item, i, arr) {
                             var typeArray = item.name.split(": ");
                             var found = false;
-
                             labels.forEach(function(item1, i1, arr1){
                                 if(item1.type == typeArray[0]){
-                                    labels[i1].subtypes.push(typeArray[1] ? typeArray[1] : "");
+                                    labels[i1].subtypes.push({subtype: typeArray[1], selected: false});
                                     found = true;
                                 }
                             })
                             if(found == false){
-                                var subtype = typeArray[1] ? typeArray[1] : "";
-                                labels.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
+                                var subtype = typeArray[1];// ? typeArray[1];
+                                labels.push({name: item.name, type: typeArray[0], subtypes: subtype ? [{subtype: subtype, selected: false}] : [], color: item.color});
                             }
                         });
                         loops++;
+
                         if(response.data.length == 30){
                             load();
                         }
@@ -46,8 +47,13 @@ store = new Vuex.Store({
                         console.log("error");
                      });
                 }
-
             commit('SET_LABELS', labels);
+
+            //function prepareLabels
+        },
+        selectLabel({commit}, payload){
+            commit("SELECT_LABEL", payload);
+
         }
     },
     mutations: {     
@@ -57,8 +63,13 @@ store = new Vuex.Store({
         SET_REPODATA(state, repoData) {
             state.repoData = repoData;
         },
-        SET_LABELS(state, labels) {
+        SET_LABELS(state, labels){
             state.labels = labels;
+        },
+        SELECT_LABEL(state, {typeIndex, subTypeIndex, selected}){
+            //console.log("ti " +typeIndex + " sti " + subTypeIndex + " value " + selected);
+            state.labels[typeIndex].subtypes[subTypeIndex].selected = selected;
+            //console.log(value);
         }
     },
     getters: {

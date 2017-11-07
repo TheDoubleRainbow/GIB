@@ -24,7 +24,7 @@ const router = new Router({
 	        },
 	        {
 			  path: '',
-	          redirect: 'issues'
+	          redirect: 'issuess'
 	        }
 	      ]
       }

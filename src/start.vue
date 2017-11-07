@@ -1,6 +1,6 @@
 Start = Repo = Vue.component('start', {
 	template: `<div>
-					<div v-if="userData.authorized">
+					<div>
 						<div id="welcome">Welcome to GIB</div> 
 						<search></search>
 					</div>

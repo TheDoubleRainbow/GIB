@@ -38,7 +38,8 @@ Repo = Vue.component('repo', {
 				    	//console.log("changed");    
 				console.log("getRepoData");
 
-				axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}`)
+				//axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}?access_token=${that.$store.getters.userData.token}`)
+				axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}?access_token=b064f1bc0e424141d2858e4f55e7a30fac240a02`)
 					  .then(function (response) {
 					  	console.log("axios");
 					    
