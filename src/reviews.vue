@@ -120,7 +120,7 @@ Reviews = Vue.component('reviews', {
 			var that = this
 			axios.post('/addReview', {
 				    repo: that.$route.params.owner+"/"+that.$route.params.repo,
-				    user: 'Anon',
+				    user: this.$store.getters.userData.login ,
 				    text: that.reviewText
 				  })
 				  .then(function (response) {
