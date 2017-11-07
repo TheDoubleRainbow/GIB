@@ -24,7 +24,7 @@ Vue.component('chat', {
 	},
 	methods:{
 		getMessageType(message){
-			return message.user == "Me" ? "chat-message chat-message-byuser" : "chat-message"
+			return message.user == this.$store.getters.userData.login ? "chat-message chat-message-byuser" : "chat-message"
 		},
 		openChat(){
 			var that = this;
@@ -49,7 +49,7 @@ Vue.component('chat', {
 					that.messages = messages;
 					document.getElementById(that.chatid).querySelector(".chat-display").scrollTop = 999999;
 				});
-				socket.emit("newMessage", {user: this.user, text: this.input, repo: this.$route.params.owner+"/"+this.$route.params.repo, chat: this.chatid})
+				socket.emit("newMessage", {user: this.$store.getters.userData.login, text: this.input, repo: this.$route.params.owner+"/"+this.$route.params.repo, chat: this.chatid})
 				//this.messages.push({user: "Me", text: this.input})
 				this.input = ""
 			}

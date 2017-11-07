@@ -60,11 +60,12 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 36);
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
+/******/ ({
+
+/***/ 0:
 /***/ (function(module, exports) {
 
 var g;
@@ -91,7 +92,653 @@ module.exports = g;
 
 
 /***/ }),
-/* 1 */
+
+/***/ 100:
+/***/ (function(module, exports) {
+
+IssuesBlock = Vue.component('issuesblock', {
+	template: `<div>
+
+					<div class = "columns is-centered animated pulse">
+						<div id="reviews-greeting" class = "column is-6-desktop is-8-tablet">
+							You are looking at <span id="reviews-reponame">{{$route.params.owner}}/{{$route.params.repo}}</span> repo. {{reviewsAmount}}
+						</div>
+						<div class = "column is-1-desktop is-2-tablet">
+							<div class = "control">
+								<button v-on:click="loadViews()" id="reviews-button" class="button is-info">Reviews</button>
+							</div>
+						</div>
+						<div class = "column is-1-desktop is-2-tablet">
+							<div class = "control">
+								<button v-on:click="loadRepodata()" id="repodata-button" class="button is-info">Repo data</button>
+							</div>
+						</div>
+					</div>
+
+					<div class = "columns is-centered animated pulse">
+						<div class = "column.is-2" id = "labels">
+							<labels></labels>
+						</div>
+						<div class = "column is-7" id = "issues">
+							<issues></issues>
+						</div>
+					</div>
+				</div>`,
+	beforeRouteUpdate (to, from, next) {
+	  	},
+	data: function(){
+			/*return {
+						repoData: {
+							owner: "",
+							repo: "",
+							repoAvailable: false
+						}
+					}
+				},*/
+				return {
+					repoData: {},
+					reviewsAmount: ""
+				};
+			},
+	props:['repodata'],
+	watch: {
+		repodata: function(){
+			this.repoData = this.repodata;
+			}
+	},
+	created: function(){
+			//this.repoData = this.repodata;
+			this.getReviewsAmount()
+			},
+	methods:{
+		getReviewsAmount: function(){
+			var that = this;
+			axios.get(`getReviews/${that.$route.params.owner}/${that.$route.params.repo}`)
+				  .then(function (response) {
+				  	var revAmount = response.data.length;
+				  	let answer = "It has ";
+				  	if(revAmount == 0){
+				  		answer += "no reviews";
+				  	}
+				  	else if(revAmount == 1){
+				  		answer += revAmount + " review";
+				  	}
+				  	else{
+				  		answer += revAmount + " reviews";
+				  	}
+				  	that.reviewsAmount = answer;
+				  })
+				  .catch(function (error) {
+				    console.log(error);
+				  });
+		},
+		loadViews: function(){
+			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/reviews`);
+		},
+		loadRepodata: function(){
+			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/repodata`);
+		}
+	}
+
+})
+
+/***/ }),
+
+/***/ 101:
+/***/ (function(module, exports) {
+
+Repodata = Vue.component('repodata', {
+	template: `<div>
+				<div class = "columns is-centered">
+								
+					<div class = "column is-8 is-8-desktop is-12-tablet">
+							<div class = "control">
+								<button v-on:click="loadIssues()" id="issues-button" class="button is-info">Back to issues</button>
+							</div>
+					</div>
+				</div>
+				<div class="loading-div-repodata" v-if="loaded<2"><img class="loading-img" src="/img/loading.gif" /></div>
+				<div v-if="loaded>2" id = "reviews" class = "columns is-centered">
+					<div class = "column is-4-widescreen is-4-fullhd is-5-desktop">
+						<div :class="getFIRatioType()">
+							<div v-if="showFI">
+							<div v-if="enoughfi" class="fi-header">FI Ratio: {{fiRatio}}% ({{fitype}})</div>
+							<div class="fi-body">
+								<div v-if="!enoughfi"> Not enough data</div>
+								<div v-if="enoughfi">Usualy it takes {{fidata.average}} days to integrate feature for this repository.</div>
+							</div> 
+							<div v-if="enoughfi" class="fi-footer">
+								<div class="fi-issue">Fastest issue: {{fidata.best}}</div><div class="fi-issue fi-issue-worst">Longest issue: {{fidata.worst}}</div>
+							</div>
+							</div>
+						</div>
+					</div>
+					<div class = "column is-4-widescreen is-4-fullhd is-5-desktop">
+						<div :class="getDFRatioType()">
+							<div v-if="showDF">
+							<div v-if="enoughdf" class="fi-header">DF Ratio: {{dfRatio}}% ({{dftype}})</div>
+							<div class="fi-body">
+								<div v-if="!enoughdf"> Not enough data</div>
+								<div v-if="enoughdf">Usualy it takes {{dfdata.average}} days to fix bug for this repository.</div>
+							</div> 
+							<div v-if="enoughdf" class="fi-footer">
+								<div class="fi-issue">Fastest issue: {{dfdata.best}}</div><div class="fi-issue fi-issue-worst">Longest issue: {{dfdata.worst}}</div>
+							</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div></div></div>`,
+	data: function() {
+		return {
+			loaded: 0,
+			showFI: false,
+			showDF: false,
+			fidata: {
+				data: [],
+				worst: 190,
+				best: 1,
+				average: 0
+			},
+			fiRatio: 0,
+			enoughfi: false,
+			fitype: "",
+			dfdata: {
+				data: [],
+				worst: 450,
+				best: 1,
+				average: 0
+			},
+			dfRatio: 0,
+			enoughdf: false,
+			dftype: ""
+		}
+	},
+	methods:{
+		loadIssues: function(){
+			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/issues`);
+		},
+		calcFIRatio: function(){
+			let worst = 0;
+			let best = 999999999;
+			for(var i = 0; i < this.fidata.data.length; i++){
+				if(worst < this.fidata.data[i]){
+					worst = this.fidata.data[i]
+				}
+				if(best > this.fidata.data[i]){
+					best = this.fidata.data[i]
+				}
+			}
+			this.fidata.best = best;
+			this.fidata.worst = worst;
+			this.fiRatio = 0;
+			for (var i = 0; i < this.fidata.data.length; i++) {
+				this.fiRatio += this.fidata.data[i]
+			}
+			this.fiRatio = this.fiRatio/this.fidata.data.length;
+			this.fidata.average = this.fiRatio.toFixed(1);
+			this.fiRatio = 100 - (this.fiRatio/this.fidata.worst).toFixed(3)*100
+			this.showFI = true;
+		},
+		getFIRatioType: function(){
+			let fitype = '';
+			if(this.fiRatio < 25){
+				fitype =  "fi-terrible";
+				this.fitype = "terrible";
+			}
+			else if(this.fiRatio > 25 && this.fiRatio < 50 ){
+				fitype =  "fi-bad";
+				this.fitype = "bad";
+			}
+			else if(this.fiRatio > 50 && this.fiRatio < 75 ){
+				fitype =  "fi-average";
+				this.fitype = "average";
+			}
+			else if(this.fiRatio > 75 && this.fiRatio < 87.5 ){
+				fitype =  "fi-good";
+				this.fitype = "good";
+			}
+			else{
+				fitype =  "fi-awesome";
+				this.fitype = "awesome";
+			}
+			return fitype += " firatio"
+		},
+		calcDFRatio: function(){
+			let worst = 0;
+			let best = 999999999;
+			for(var i = 0; i < this.dfdata.data.length; i++){
+				if(worst < this.dfdata.data[i]){
+					worst = this.dfdata.data[i]
+				}
+				if(best > this.dfdata.data[i]){
+					best = this.dfdata.data[i]
+				}
+			}
+			this.dfdata.best = best;
+			this.dfdata.worst = worst;
+			this.dfRatio = 0;
+			for (var i = 0; i < this.dfdata.data.length; i++) {
+				this.dfRatio += this.dfdata.data[i]
+			}
+			this.dfRatio = this.dfRatio/this.dfdata.data.length;
+			this.dfdata.average = this.dfRatio.toFixed(1);
+			this.dfRatio = 100 - ((this.dfRatio/this.dfdata.worst)*100).toFixed(2)
+			this.showDF = true;
+		},
+		getDFRatioType: function(){
+			let dftype = '';
+			if(this.dfRatio < 25){
+				dftype =  "fi-terrible";
+				this.dftype = "terrible";
+			}
+			else if(this.dfRatio > 25 && this.dfRatio < 50 ){
+				dftype =  "fi-bad";
+				this.dftype = "bad";
+			}
+			else if(this.dfRatio > 50 && this.dfRatio < 75 ){
+				dftype =  "fi-average";
+				this.dftype = "average";
+			}
+			else if(this.dfRatio > 75 && this.dfRatio < 87.5 ){
+				dftype =  "fi-good";
+				this.dftype = "good";
+			}
+			else{
+				dftype =  "fi-awesome";
+				this.dftype = "awesome";
+			}
+			return dftype += " firatio"
+		},
+		getDif(raw1, raw2){
+			var dif = 0;
+			var d = {}; var d2 = {};
+			d.raw = raw1
+			d2.raw = raw2
+			d.year = d.raw.split("-")[0]*1;
+			d.month = d.raw.split("-")[1]*1;
+			d.day = (d.raw.split("-")[2][0]+d.raw.split("-")[2][1])*1;
+			d2.year = d2.raw.split("-")[0]*1;
+			d2.month = d2.raw.split("-")[1]*1;
+			d2.day = (d2.raw.split("-")[2][0]+d2.raw.split("-")[2][1])*1;
+			if(d.day-d2.day != 0){
+				dif += d.day-d2.day;
+			}
+			if(d.month - d2.month != 0){
+				dif += (d.month-d2.month)*30;
+			}
+			if((d.year-d2.year) != 0){
+				dif += (d.year - d2.year)*365;
+			}
+			return dif
+		},
+		getData: function(){
+			this.loaded = 0;
+			var that = this;
+			var loopfi = 1;
+			var loopdfr = 1;
+			var loopdfn = 1;
+			function loadfi(){
+				axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/issues?state=closed&&access_token=${user_data.token}&&page=${loopfi}`)
+	                      .then(function (response){
+	                      	response.data.forEach(function(item, i, arr) {
+	                        	that.fidata.data.push(that.getDif(item.closed_at, item.created_at));
+	                        });
+	                        that.calcFIRatio();
+	                        if(that.fidata.data.length > 5){
+	                        	that.enoughfi = true;
+	                        }
+	                        if(response.data.length == 30 && loopfi < 51){
+	                        	loopfi++
+	                        	loadfi();
+	                        }
+	                        else{
+	                        	that.loaded++
+	                        	console.log(that.fidata.length)
+	                        }
+	                      })
+	                      .catch(function (error) {
+	                        console.log("error");
+	                     });
+			}
+			function loaddf(){
+				function loaddfr(){
+					axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/issues?labels=Type:%20bug&&state=closed&&access_token=${user_data.token}&&page=${loopdfr}`)
+	                      .then(function (response){
+	                        response.data.forEach(function(item, i, arr) {
+	                        	that.dfdata.data.push(that.getDif(item.closed_at, item.created_at));
+	                        });
+	                        that.calcDFRatio();
+	                        if(that.dfdata.data.length > 5){
+	                        	that.enoughdf = true;
+	                        }
+	                        if(response.data.length == 30){
+	                        	loaddr();
+	                        	loopdfr++
+	                        }
+	                        else{
+	                        	that.loaded++;
+	                        }
+	                      })
+	                      .catch(function (error) {
+	                        console.log("error");
+	                     });
+				}
+				function loaddfn(){
+					axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/issues?labels=bug&&state=closed&&access_token=${user_data.token}&&page=${loopdfn}`)
+	                      .then(function (response){
+	                        response.data.forEach(function(item, i, arr) {
+	                        	that.dfdata.data.push(that.getDif(item.closed_at, item.created_at));
+	                        });
+	                        that.calcDFRatio();
+	                        if(that.dfdata.data.length > 5){
+	                        	that.enoughdf = true;
+	                        }
+	                        if(response.data.length == 30){
+	                        	loaddf();
+	                        	loopdfn++
+	                        }
+	                        else{
+	                        	that.loaded++;
+	                        }
+	                      })
+	                      .catch(function (error) {
+	                        console.log("error");
+	                     });
+				}
+				loaddfr();
+				loaddfn();
+			}
+			loaddf();
+			loadfi();
+		}
+	},
+	created: function(){
+		this.calcFIRatio();
+		this.calcDFRatio();
+		this.getData();
+		this.getDif("2016-07-14T12:11:30Z", "2015-07-26T12:11:30Z")
+	}
+})
+
+/***/ }),
+
+/***/ 102:
+/***/ (function(module, exports) {
+
+Start = Repo = Vue.component('start', {
+	template: `<div>
+					<div v-if="userData.auth">
+						<div id="welcome">Welcome to GIB</div> 
+						<search></search>
+					</div>
+					<div v-if="userData.auth == false">
+						<a href = "http://github.com/login/oauth/authorize?client_id=f343de2cdd05ffd0d470">GITHUB</a>
+					</div>
+				</div>`,
+	computed: {
+	    	userData: function () {
+	      		return this.$store.getters.userData;
+	      		//return [];
+	    	}
+  	}
+
+});
+
+/***/ }),
+
+/***/ 13:
+/***/ (function(module, exports, __webpack_require__) {
+
+var apply = Function.prototype.apply;
+
+// DOM APIs, for completeness
+
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+};
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+};
+exports.clearTimeout =
+exports.clearInterval = function(timeout) {
+  if (timeout) {
+    timeout.close();
+  }
+};
+
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
+}
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(window, this._id);
+};
+
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
+};
+
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
+};
+
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
+
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
+};
+
+// setimmediate attaches itself to the global object
+__webpack_require__(38);
+exports.setImmediate = setImmediate;
+exports.clearImmediate = clearImmediate;
+
+
+/***/ }),
+
+/***/ 2:
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+
+/***/ 35:
 /***/ (function(module, exports) {
 
 Reviews = Vue.component('reviews', {
@@ -234,25 +881,27 @@ Reviews = Vue.component('reviews', {
 })
 
 /***/ }),
-/* 2 */
+
+/***/ 36:
 /***/ (function(module, exports, __webpack_require__) {
 
-Vue = __webpack_require__(3);
-Router = __webpack_require__(7);
-io = __webpack_require__(8);
+Vue = __webpack_require__(37);
+Router = __webpack_require__(39);
+io = __webpack_require__(40);
 //axios = require("./lib/axios/axios.js");
-__webpack_require__(9);
-__webpack_require__(1)
-__webpack_require__(10);
-__webpack_require__(11);
-__webpack_require__(12);
-__webpack_require__(13);
-__webpack_require__(14);
+__webpack_require__(90);
+__webpack_require__(35)
+__webpack_require__(91);
+__webpack_require__(92);
+__webpack_require__(93);
+__webpack_require__(94);
+__webpack_require__(95);
 
 
 
 /***/ }),
-/* 3 */
+
+/***/ 37:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, setImmediate) {/*!
@@ -10808,69 +11457,11 @@ return Vue$3;
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(4).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(13).setImmediate))
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
 
-var apply = Function.prototype.apply;
-
-// DOM APIs, for completeness
-
-exports.setTimeout = function() {
-  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
-};
-exports.setInterval = function() {
-  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
-};
-exports.clearTimeout =
-exports.clearInterval = function(timeout) {
-  if (timeout) {
-    timeout.close();
-  }
-};
-
-function Timeout(id, clearFn) {
-  this._id = id;
-  this._clearFn = clearFn;
-}
-Timeout.prototype.unref = Timeout.prototype.ref = function() {};
-Timeout.prototype.close = function() {
-  this._clearFn.call(window, this._id);
-};
-
-// Does not start the time, just sets up the members needed.
-exports.enroll = function(item, msecs) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = msecs;
-};
-
-exports.unenroll = function(item) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = -1;
-};
-
-exports._unrefActive = exports.active = function(item) {
-  clearTimeout(item._idleTimeoutId);
-
-  var msecs = item._idleTimeout;
-  if (msecs >= 0) {
-    item._idleTimeoutId = setTimeout(function onTimeout() {
-      if (item._onTimeout)
-        item._onTimeout();
-    }, msecs);
-  }
-};
-
-// setimmediate attaches itself to the global object
-__webpack_require__(5);
-exports.setImmediate = setImmediate;
-exports.clearImmediate = clearImmediate;
-
-
-/***/ }),
-/* 5 */
+/***/ 38:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -11060,200 +11651,11 @@ exports.clearImmediate = clearImmediate;
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(6)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(2)))
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports) {
 
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-
-/***/ }),
-/* 7 */
+/***/ 39:
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -11264,7 +11666,8 @@ process.umask = function() { return 0; };
 !function(t,e){ true?module.exports=e():"function"==typeof define&&define.amd?define(e):t.VueRouter=e()}(this,function(){"use strict";function t(t,e){}function e(t){return Object.prototype.toString.call(t).indexOf("Error")>-1}function r(t,e){switch(typeof e){case"undefined":return;case"object":return e;case"function":return e(t);case"boolean":return e?t.params:void 0}}function n(t,e){for(var r in e)t[r]=e[r];return t}function o(t,e,r){void 0===e&&(e={});var n,o=r||i;try{n=o(t||"")}catch(t){n={}}for(var a in e)n[a]=e[a];return n}function i(t){var e={};return(t=t.trim().replace(/^(\?|#|&)/,""))?(t.split("&").forEach(function(t){var r=t.replace(/\+/g," ").split("="),n=Ut(r.shift()),o=r.length>0?Ut(r.join("=")):null;void 0===e[n]?e[n]=o:Array.isArray(e[n])?e[n].push(o):e[n]=[e[n],o]}),e):e}function a(t){var e=t?Object.keys(t).map(function(e){var r=t[e];if(void 0===r)return"";if(null===r)return Pt(e);if(Array.isArray(r)){var n=[];return r.forEach(function(t){void 0!==t&&(null===t?n.push(Pt(e)):n.push(Pt(e)+"="+Pt(t)))}),n.join("&")}return Pt(e)+"="+Pt(r)}).filter(function(t){return t.length>0}).join("&"):null;return e?"?"+e:""}function u(t,e,r,n){var o=n&&n.options.stringifyQuery,i=e.query||{};try{i=c(i)}catch(t){}var a={name:e.name||t&&t.name,meta:t&&t.meta||{},path:e.path||"/",hash:e.hash||"",query:i,params:e.params||{},fullPath:p(e,o),matched:t?s(t):[]};return r&&(a.redirectedFrom=p(r,o)),Object.freeze(a)}function c(t){if(Array.isArray(t))return t.map(c);if(t&&"object"==typeof t){var e={};for(var r in t)e[r]=c(t[r]);return e}return t}function s(t){for(var e=[];t;)e.unshift(t),t=t.parent;return e}function p(t,e){var r=t.path,n=t.query;void 0===n&&(n={});var o=t.hash;void 0===o&&(o="");var i=e||a;return(r||"/")+i(n)+o}function f(t,e){return e===Ht?t===e:!!e&&(t.path&&e.path?t.path.replace(Mt,"")===e.path.replace(Mt,"")&&t.hash===e.hash&&h(t.query,e.query):!(!t.name||!e.name)&&(t.name===e.name&&t.hash===e.hash&&h(t.query,e.query)&&h(t.params,e.params)))}function h(t,e){if(void 0===t&&(t={}),void 0===e&&(e={}),!t||!e)return t===e;var r=Object.keys(t),n=Object.keys(e);return r.length===n.length&&r.every(function(r){var n=t[r],o=e[r];return"object"==typeof n&&"object"==typeof o?h(n,o):String(n)===String(o)})}function l(t,e){return 0===t.path.replace(Mt,"/").indexOf(e.path.replace(Mt,"/"))&&(!e.hash||t.hash===e.hash)&&d(t.query,e.query)}function d(t,e){for(var r in e)if(!(r in t))return!1;return!0}function y(t){if(!(t.metaKey||t.altKey||t.ctrlKey||t.shiftKey||t.defaultPrevented||void 0!==t.button&&0!==t.button)){if(t.currentTarget&&t.currentTarget.getAttribute){var e=t.currentTarget.getAttribute("target");if(/\b_blank\b/i.test(e))return}return t.preventDefault&&t.preventDefault(),!0}}function v(t){if(t)for(var e,r=0;r<t.length;r++){if("a"===(e=t[r]).tag)return e;if(e.children&&(e=v(e.children)))return e}}function m(t){if(!m.installed||Tt!==t){m.installed=!0,Tt=t;var e=function(t){return void 0!==t},r=function(t,r){var n=t.$options._parentVnode;e(n)&&e(n=n.data)&&e(n=n.registerRouteInstance)&&n(t,r)};t.mixin({beforeCreate:function(){e(this.$options.router)?(this._routerRoot=this,this._router=this.$options.router,this._router.init(this),t.util.defineReactive(this,"_route",this._router.history.current)):this._routerRoot=this.$parent&&this.$parent._routerRoot||this,r(this,this)},destroyed:function(){r(this)}}),Object.defineProperty(t.prototype,"$router",{get:function(){return this._routerRoot._router}}),Object.defineProperty(t.prototype,"$route",{get:function(){return this._routerRoot._route}}),t.component("router-view",St),t.component("router-link",zt);var n=t.config.optionMergeStrategies;n.beforeRouteEnter=n.beforeRouteLeave=n.beforeRouteUpdate=n.created}}function g(t,e,r){var n=t.charAt(0);if("/"===n)return t;if("?"===n||"#"===n)return e+t;var o=e.split("/");r&&o[o.length-1]||o.pop();for(var i=t.replace(/^\//,"").split("/"),a=0;a<i.length;a++){var u=i[a];".."===u?o.pop():"."!==u&&o.push(u)}return""!==o[0]&&o.unshift(""),o.join("/")}function b(t){var e="",r="",n=t.indexOf("#");n>=0&&(e=t.slice(n),t=t.slice(0,n));var o=t.indexOf("?");return o>=0&&(r=t.slice(o+1),t=t.slice(0,o)),{path:t,query:r,hash:e}}function w(t){return t.replace(/\/\//g,"/")}function x(t,e){for(var r,n=[],o=0,i=0,a="",u=e&&e.delimiter||"/";null!=(r=Qt.exec(t));){var c=r[0],s=r[1],p=r.index;if(a+=t.slice(i,p),i=p+c.length,s)a+=s[1];else{var f=t[i],h=r[2],l=r[3],d=r[4],y=r[5],v=r[6],m=r[7];a&&(n.push(a),a="");var g=null!=h&&null!=f&&f!==h,b="+"===v||"*"===v,w="?"===v||"*"===v,x=r[2]||u,k=d||y;n.push({name:l||o++,prefix:h||"",delimiter:x,optional:w,repeat:b,partial:g,asterisk:!!m,pattern:k?C(k):m?".*":"[^"+O(x)+"]+?"})}}return i<t.length&&(a+=t.substr(i)),a&&n.push(a),n}function k(t){return encodeURI(t).replace(/[\/?#]/g,function(t){return"%"+t.charCodeAt(0).toString(16).toUpperCase()})}function R(t){return encodeURI(t).replace(/[?#]/g,function(t){return"%"+t.charCodeAt(0).toString(16).toUpperCase()})}function E(t){for(var e=new Array(t.length),r=0;r<t.length;r++)"object"==typeof t[r]&&(e[r]=new RegExp("^(?:"+t[r].pattern+")$"));return function(r,n){for(var o="",i=r||{},a=(n||{}).pretty?k:encodeURIComponent,u=0;u<t.length;u++){var c=t[u];if("string"!=typeof c){var s,p=i[c.name];if(null==p){if(c.optional){c.partial&&(o+=c.prefix);continue}throw new TypeError('Expected "'+c.name+'" to be defined')}if(Ft(p)){if(!c.repeat)throw new TypeError('Expected "'+c.name+'" to not repeat, but received `'+JSON.stringify(p)+"`");if(0===p.length){if(c.optional)continue;throw new TypeError('Expected "'+c.name+'" to not be empty')}for(var f=0;f<p.length;f++){if(s=a(p[f]),!e[u].test(s))throw new TypeError('Expected all "'+c.name+'" to match "'+c.pattern+'", but received `'+JSON.stringify(s)+"`");o+=(0===f?c.prefix:c.delimiter)+s}}else{if(s=c.asterisk?R(p):a(p),!e[u].test(s))throw new TypeError('Expected "'+c.name+'" to match "'+c.pattern+'", but received "'+s+'"');o+=c.prefix+s}}else o+=c}return o}}function O(t){return t.replace(/([.+*?=^!:${}()[\]|\/\\])/g,"\\$1")}function C(t){return t.replace(/([=!:$\/()])/g,"\\$1")}function j(t,e){return t.keys=e,t}function A(t){return t.sensitive?"":"i"}function _(t,e){var r=t.source.match(/\((?!\?)/g);if(r)for(var n=0;n<r.length;n++)e.push({name:n,prefix:null,delimiter:null,optional:!1,repeat:!1,partial:!1,asterisk:!1,pattern:null});return j(t,e)}function T(t,e,r){for(var n=[],o=0;o<t.length;o++)n.push(q(t[o],e,r).source);return j(new RegExp("(?:"+n.join("|")+")",A(r)),e)}function S(t,e,r){return $(x(t,r),e,r)}function $(t,e,r){Ft(e)||(r=e||r,e=[]);for(var n=(r=r||{}).strict,o=!1!==r.end,i="",a=0;a<t.length;a++){var u=t[a];if("string"==typeof u)i+=O(u);else{var c=O(u.prefix),s="(?:"+u.pattern+")";e.push(u),u.repeat&&(s+="(?:"+c+s+")*"),i+=s=u.optional?u.partial?c+"("+s+")?":"(?:"+c+"("+s+"))?":c+"("+s+")"}}var p=O(r.delimiter||"/"),f=i.slice(-p.length)===p;return n||(i=(f?i.slice(0,-p.length):i)+"(?:"+p+"(?=$))?"),i+=o?"$":n&&f?"":"(?="+p+"|$)",j(new RegExp("^"+i,A(r)),e)}function q(t,e,r){return Ft(e)||(r=e||r,e=[]),r=r||{},t instanceof RegExp?_(t,e):Ft(t)?T(t,e,r):S(t,e,r)}function L(t,e,r){try{return(Xt[t]||(Xt[t]=Dt.compile(t)))(e||{},{pretty:!0})}catch(t){return""}}function P(t,e,r,n){var o=e||[],i=r||Object.create(null),a=n||Object.create(null);t.forEach(function(t){U(o,i,a,t)});for(var u=0,c=o.length;u<c;u++)"*"===o[u]&&(o.push(o.splice(u,1)[0]),c--,u--);return{pathList:o,pathMap:i,nameMap:a}}function U(t,e,r,n,o,i){var a=n.path,u=n.name,c=n.pathToRegexpOptions||{},s=H(a,o,c.strict);"boolean"==typeof n.caseSensitive&&(c.sensitive=n.caseSensitive);var p={path:s,regex:M(s,c),components:n.components||{default:n.component},instances:{},name:u,parent:o,matchAs:i,redirect:n.redirect,beforeEnter:n.beforeEnter,meta:n.meta||{},props:null==n.props?{}:n.components?n.props:{default:n.props}};n.children&&n.children.forEach(function(n){var o=i?w(i+"/"+n.path):void 0;U(t,e,r,n,p,o)}),void 0!==n.alias&&(Array.isArray(n.alias)?n.alias:[n.alias]).forEach(function(i){var a={path:i,children:n.children};U(t,e,r,a,o,p.path||"/")}),e[p.path]||(t.push(p.path),e[p.path]=p),u&&(r[u]||(r[u]=p))}function M(t,e){return Dt(t,[],e)}function H(t,e,r){return r||(t=t.replace(/\/$/,"")),"/"===t[0]?t:null==e?t:w(e.path+"/"+t)}function I(t,e,r,n){var i="string"==typeof t?{path:t}:t;if(i.name||i._normalized)return i;if(!i.path&&i.params&&e){(i=V({},i))._normalized=!0;var a=V(V({},e.params),i.params);if(e.name)i.name=e.name,i.params=a;else if(e.matched.length){var u=e.matched[e.matched.length-1].path;i.path=L(u,a,"path "+e.path)}return i}var c=b(i.path||""),s=e&&e.path||"/",p=c.path?g(c.path,s,r||i.append):s,f=o(c.query,i.query,n&&n.options.parseQuery),h=i.hash||c.hash;return h&&"#"!==h.charAt(0)&&(h="#"+h),{_normalized:!0,path:p,query:f,hash:h}}function V(t,e){for(var r in e)t[r]=e[r];return t}function z(t,e){function r(t,r,n){var o=I(t,r,!1,e),a=o.name;if(a){var u=p[a];if(!u)return i(null,o);var f=u.regex.keys.filter(function(t){return!t.optional}).map(function(t){return t.name});if("object"!=typeof o.params&&(o.params={}),r&&"object"==typeof r.params)for(var h in r.params)!(h in o.params)&&f.indexOf(h)>-1&&(o.params[h]=r.params[h]);if(u)return o.path=L(u.path,o.params,'named route "'+a+'"'),i(u,o,n)}else if(o.path){o.params={};for(var l=0;l<c.length;l++){var d=c[l],y=s[d];if(B(y.regex,o.path,o.params))return i(y,o,n)}}return i(null,o)}function n(t,n){var o=t.redirect,a="function"==typeof o?o(u(t,n,null,e)):o;if("string"==typeof a&&(a={path:a}),!a||"object"!=typeof a)return i(null,n);var c=a,s=c.name,p=c.path,f=n.query,h=n.hash,l=n.params;if(f=c.hasOwnProperty("query")?c.query:f,h=c.hasOwnProperty("hash")?c.hash:h,l=c.hasOwnProperty("params")?c.params:l,s)return r({_normalized:!0,name:s,query:f,hash:h,params:l},void 0,n);if(p){var d=F(p,t);return r({_normalized:!0,path:L(d,l,'redirect route with path "'+d+'"'),query:f,hash:h},void 0,n)}return i(null,n)}function o(t,e,n){var o=r({_normalized:!0,path:L(n,e.params,'aliased route with path "'+n+'"')});if(o){var a=o.matched,u=a[a.length-1];return e.params=o.params,i(u,e)}return i(null,e)}function i(t,r,i){return t&&t.redirect?n(t,i||r):t&&t.matchAs?o(t,r,t.matchAs):u(t,r,i,e)}var a=P(t),c=a.pathList,s=a.pathMap,p=a.nameMap;return{match:r,addRoutes:function(t){P(t,c,s,p)}}}function B(t,e,r){var n=e.match(t);if(!n)return!1;if(!r)return!0;for(var o=1,i=n.length;o<i;++o){var a=t.keys[o-1],u="string"==typeof n[o]?decodeURIComponent(n[o]):n[o];a&&(r[a.name]=u)}return!0}function F(t,e){return g(t,e.parent?e.parent.path:"/",!0)}function D(){window.history.replaceState({key:et()},""),window.addEventListener("popstate",function(t){J(),t.state&&t.state.key&&rt(t.state.key)})}function K(t,e,r,n){if(t.app){var o=t.options.scrollBehavior;o&&t.app.$nextTick(function(){var t=N(),i=o(e,r,n?t:null);i&&("function"==typeof i.then?i.then(function(e){Z(e,t)}).catch(function(t){}):Z(i,t))})}}function J(){var t=et();t&&(Yt[t]={x:window.pageXOffset,y:window.pageYOffset})}function N(){var t=et();if(t)return Yt[t]}function Q(t,e){var r=document.documentElement.getBoundingClientRect(),n=t.getBoundingClientRect();return{x:n.left-r.left-e.x,y:n.top-r.top-e.y}}function X(t){return G(t.x)||G(t.y)}function Y(t){return{x:G(t.x)?t.x:window.pageXOffset,y:G(t.y)?t.y:window.pageYOffset}}function W(t){return{x:G(t.x)?t.x:0,y:G(t.y)?t.y:0}}function G(t){return"number"==typeof t}function Z(t,e){var r="object"==typeof t;if(r&&"string"==typeof t.selector){var n=document.querySelector(t.selector);if(n){var o=t.offset&&"object"==typeof t.offset?t.offset:{};e=Q(n,o=W(o))}else X(t)&&(e=Y(t))}else r&&X(t)&&(e=Y(t));e&&window.scrollTo(e.x,e.y)}function tt(){return Gt.now().toFixed(3)}function et(){return Zt}function rt(t){Zt=t}function nt(t,e){J();var r=window.history;try{e?r.replaceState({key:Zt},"",t):(Zt=tt(),r.pushState({key:Zt},"",t))}catch(r){window.location[e?"replace":"assign"](t)}}function ot(t){nt(t,!0)}function it(t,e,r){var n=function(o){o>=t.length?r():t[o]?e(t[o],function(){n(o+1)}):n(o+1)};n(0)}function at(t){return function(r,n,o){var i=!1,a=0,u=null;ut(t,function(t,r,n,c){if("function"==typeof t&&void 0===t.cid){i=!0,a++;var s,p=pt(function(e){st(e)&&(e=e.default),t.resolved="function"==typeof e?e:Tt.extend(e),n.components[c]=e,--a<=0&&o()}),f=pt(function(t){var r="Failed to resolve async component "+c+": "+t;u||(u=e(t)?t:new Error(r),o(u))});try{s=t(p,f)}catch(t){f(t)}if(s)if("function"==typeof s.then)s.then(p,f);else{var h=s.component;h&&"function"==typeof h.then&&h.then(p,f)}}}),i||o()}}function ut(t,e){return ct(t.map(function(t){return Object.keys(t.components).map(function(r){return e(t.components[r],t.instances[r],t,r)})}))}function ct(t){return Array.prototype.concat.apply([],t)}function st(t){return t.__esModule||te&&"Module"===t[Symbol.toStringTag]}function pt(t){var e=!1;return function(){for(var r=[],n=arguments.length;n--;)r[n]=arguments[n];if(!e)return e=!0,t.apply(this,r)}}function ft(t){if(!t)if(Bt){var e=document.querySelector("base");t=(t=e&&e.getAttribute("href")||"/").replace(/^https?:\/\/[^\/]+/,"")}else t="/";return"/"!==t.charAt(0)&&(t="/"+t),t.replace(/\/$/,"")}function ht(t,e){var r,n=Math.max(t.length,e.length);for(r=0;r<n&&t[r]===e[r];r++);return{updated:e.slice(0,r),activated:e.slice(r),deactivated:t.slice(r)}}function lt(t,e,r,n){var o=ut(t,function(t,n,o,i){var a=dt(t,e);if(a)return Array.isArray(a)?a.map(function(t){return r(t,n,o,i)}):r(a,n,o,i)});return ct(n?o.reverse():o)}function dt(t,e){return"function"!=typeof t&&(t=Tt.extend(t)),t.options[e]}function yt(t){return lt(t,"beforeRouteLeave",mt,!0)}function vt(t){return lt(t,"beforeRouteUpdate",mt)}function mt(t,e){if(e)return function(){return t.apply(e,arguments)}}function gt(t,e,r){return lt(t,"beforeRouteEnter",function(t,n,o,i){return bt(t,o,i,e,r)})}function bt(t,e,r,n,o){return function(i,a,u){return t(i,a,function(t){u(t),"function"==typeof t&&n.push(function(){wt(t,e.instances,r,o)})})}}function wt(t,e,r,n){e[r]?t(e[r]):n()&&setTimeout(function(){wt(t,e,r,n)},16)}function xt(t){var e=window.location.pathname;return t&&0===e.indexOf(t)&&(e=e.slice(t.length)),(e||"/")+window.location.search+window.location.hash}function kt(t){var e=xt(t);if(!/^\/#/.test(e))return window.location.replace(w(t+"/#"+e)),!0}function Rt(){var t=Et();return"/"===t.charAt(0)||(jt("/"+t),!1)}function Et(){var t=window.location.href,e=t.indexOf("#");return-1===e?"":t.slice(e+1)}function Ot(t){var e=window.location.href,r=e.indexOf("#");return(r>=0?e.slice(0,r):e)+"#"+t}function Ct(t){Wt?nt(Ot(t)):window.location.hash=t}function jt(t){Wt?ot(Ot(t)):window.location.replace(Ot(t))}function At(t,e){return t.push(e),function(){var r=t.indexOf(e);r>-1&&t.splice(r,1)}}function _t(t,e,r){var n="hash"===r?"#"+e:e;return t?w(t+"/"+n):n}var Tt,St={name:"router-view",functional:!0,props:{name:{type:String,default:"default"}},render:function(t,e){var o=e.props,i=e.children,a=e.parent,u=e.data;u.routerView=!0;for(var c=a.$createElement,s=o.name,p=a.$route,f=a._routerViewCache||(a._routerViewCache={}),h=0,l=!1;a&&a._routerRoot!==a;)a.$vnode&&a.$vnode.data.routerView&&h++,a._inactive&&(l=!0),a=a.$parent;if(u.routerViewDepth=h,l)return c(f[s],u,i);var d=p.matched[h];if(!d)return f[s]=null,c();var y=f[s]=d.components[s];u.registerRouteInstance=function(t,e){var r=d.instances[s];(e&&r!==t||!e&&r===t)&&(d.instances[s]=e)},(u.hook||(u.hook={})).prepatch=function(t,e){d.instances[s]=e.componentInstance};var v=u.props=r(p,d.props&&d.props[s]);if(v){v=u.props=n({},v);var m=u.attrs=u.attrs||{};for(var g in v)y.props&&g in y.props||(m[g]=v[g],delete v[g])}return c(y,u,i)}},$t=/[!'()*]/g,qt=function(t){return"%"+t.charCodeAt(0).toString(16)},Lt=/%2C/g,Pt=function(t){return encodeURIComponent(t).replace($t,qt).replace(Lt,",")},Ut=decodeURIComponent,Mt=/\/?$/,Ht=u(null,{path:"/"}),It=[String,Object],Vt=[String,Array],zt={name:"router-link",props:{to:{type:It,required:!0},tag:{type:String,default:"a"},exact:Boolean,append:Boolean,replace:Boolean,activeClass:String,exactActiveClass:String,event:{type:Vt,default:"click"}},render:function(t){var e=this,r=this.$router,n=this.$route,o=r.resolve(this.to,n,this.append),i=o.location,a=o.route,c=o.href,s={},p=r.options.linkActiveClass,h=r.options.linkExactActiveClass,d=null==p?"router-link-active":p,m=null==h?"router-link-exact-active":h,g=null==this.activeClass?d:this.activeClass,b=null==this.exactActiveClass?m:this.exactActiveClass,w=i.path?u(null,i,null,r):a;s[b]=f(n,w),s[g]=this.exact?s[b]:l(n,w);var x=function(t){y(t)&&(e.replace?r.replace(i):r.push(i))},k={click:y};Array.isArray(this.event)?this.event.forEach(function(t){k[t]=x}):k[this.event]=x;var R={class:s};if("a"===this.tag)R.on=k,R.attrs={href:c};else{var E=v(this.$slots.default);if(E){E.isStatic=!1;var O=Tt.util.extend;(E.data=O({},E.data)).on=k,(E.data.attrs=O({},E.data.attrs)).href=c}else R.on=k}return t(this.tag,R,this.$slots.default)}},Bt="undefined"!=typeof window,Ft=Array.isArray||function(t){return"[object Array]"==Object.prototype.toString.call(t)},Dt=q,Kt=x,Jt=E,Nt=$,Qt=new RegExp(["(\\\\.)","([\\/.])?(?:(?:\\:(\\w+)(?:\\(((?:\\\\.|[^\\\\()])+)\\))?|\\(((?:\\\\.|[^\\\\()])+)\\))([+*?])?|(\\*))"].join("|"),"g");Dt.parse=Kt,Dt.compile=function(t,e){return E(x(t,e))},Dt.tokensToFunction=Jt,Dt.tokensToRegExp=Nt;var Xt=Object.create(null),Yt=Object.create(null),Wt=Bt&&function(){var t=window.navigator.userAgent;return(-1===t.indexOf("Android 2.")&&-1===t.indexOf("Android 4.0")||-1===t.indexOf("Mobile Safari")||-1!==t.indexOf("Chrome")||-1!==t.indexOf("Windows Phone"))&&(window.history&&"pushState"in window.history)}(),Gt=Bt&&window.performance&&window.performance.now?window.performance:Date,Zt=tt(),te="function"==typeof Symbol&&"symbol"==typeof Symbol.toStringTag,ee=function(t,e){this.router=t,this.base=ft(e),this.current=Ht,this.pending=null,this.ready=!1,this.readyCbs=[],this.readyErrorCbs=[],this.errorCbs=[]};ee.prototype.listen=function(t){this.cb=t},ee.prototype.onReady=function(t,e){this.ready?t():(this.readyCbs.push(t),e&&this.readyErrorCbs.push(e))},ee.prototype.onError=function(t){this.errorCbs.push(t)},ee.prototype.transitionTo=function(t,e,r){var n=this,o=this.router.match(t,this.current);this.confirmTransition(o,function(){n.updateRoute(o),e&&e(o),n.ensureURL(),n.ready||(n.ready=!0,n.readyCbs.forEach(function(t){t(o)}))},function(t){r&&r(t),t&&!n.ready&&(n.ready=!0,n.readyErrorCbs.forEach(function(e){e(t)}))})},ee.prototype.confirmTransition=function(r,n,o){var i=this,a=this.current,u=function(r){e(r)&&(i.errorCbs.length?i.errorCbs.forEach(function(t){t(r)}):(t(!1,"uncaught error during route navigation:"),console.error(r))),o&&o(r)};if(f(r,a)&&r.matched.length===a.matched.length)return this.ensureURL(),u();var c=ht(this.current.matched,r.matched),s=c.updated,p=c.deactivated,h=c.activated,l=[].concat(yt(p),this.router.beforeHooks,vt(s),h.map(function(t){return t.beforeEnter}),at(h));this.pending=r;var d=function(t,n){if(i.pending!==r)return u();try{t(r,a,function(t){!1===t||e(t)?(i.ensureURL(!0),u(t)):"string"==typeof t||"object"==typeof t&&("string"==typeof t.path||"string"==typeof t.name)?(u(),"object"==typeof t&&t.replace?i.replace(t):i.push(t)):n(t)})}catch(t){u(t)}};it(l,d,function(){var t=[];it(gt(h,t,function(){return i.current===r}).concat(i.router.resolveHooks),d,function(){if(i.pending!==r)return u();i.pending=null,n(r),i.router.app&&i.router.app.$nextTick(function(){t.forEach(function(t){t()})})})})},ee.prototype.updateRoute=function(t){var e=this.current;this.current=t,this.cb&&this.cb(t),this.router.afterHooks.forEach(function(r){r&&r(t,e)})};var re=function(t){function e(e,r){var n=this;t.call(this,e,r);var o=e.options.scrollBehavior;o&&D();var i=xt(this.base);window.addEventListener("popstate",function(t){var r=n.current,a=xt(n.base);n.current===Ht&&a===i||n.transitionTo(a,function(t){o&&K(e,t,r,!0)})})}return t&&(e.__proto__=t),e.prototype=Object.create(t&&t.prototype),e.prototype.constructor=e,e.prototype.go=function(t){window.history.go(t)},e.prototype.push=function(t,e,r){var n=this,o=this.current;this.transitionTo(t,function(t){nt(w(n.base+t.fullPath)),K(n.router,t,o,!1),e&&e(t)},r)},e.prototype.replace=function(t,e,r){var n=this,o=this.current;this.transitionTo(t,function(t){ot(w(n.base+t.fullPath)),K(n.router,t,o,!1),e&&e(t)},r)},e.prototype.ensureURL=function(t){if(xt(this.base)!==this.current.fullPath){var e=w(this.base+this.current.fullPath);t?nt(e):ot(e)}},e.prototype.getCurrentLocation=function(){return xt(this.base)},e}(ee),ne=function(t){function e(e,r,n){t.call(this,e,r),n&&kt(this.base)||Rt()}return t&&(e.__proto__=t),e.prototype=Object.create(t&&t.prototype),e.prototype.constructor=e,e.prototype.setupListeners=function(){var t=this,e=this.router.options.scrollBehavior,r=Wt&&e;r&&D(),window.addEventListener(Wt?"popstate":"hashchange",function(){var e=t.current;Rt()&&t.transitionTo(Et(),function(n){r&&K(t.router,n,e,!0),Wt||jt(n.fullPath)})})},e.prototype.push=function(t,e,r){var n=this,o=this.current;this.transitionTo(t,function(t){Ct(t.fullPath),K(n.router,t,o,!1),e&&e(t)},r)},e.prototype.replace=function(t,e,r){var n=this,o=this.current;this.transitionTo(t,function(t){jt(t.fullPath),K(n.router,t,o,!1),e&&e(t)},r)},e.prototype.go=function(t){window.history.go(t)},e.prototype.ensureURL=function(t){var e=this.current.fullPath;Et()!==e&&(t?Ct(e):jt(e))},e.prototype.getCurrentLocation=function(){return Et()},e}(ee),oe=function(t){function e(e,r){t.call(this,e,r),this.stack=[],this.index=-1}return t&&(e.__proto__=t),e.prototype=Object.create(t&&t.prototype),e.prototype.constructor=e,e.prototype.push=function(t,e,r){var n=this;this.transitionTo(t,function(t){n.stack=n.stack.slice(0,n.index+1).concat(t),n.index++,e&&e(t)},r)},e.prototype.replace=function(t,e,r){var n=this;this.transitionTo(t,function(t){n.stack=n.stack.slice(0,n.index).concat(t),e&&e(t)},r)},e.prototype.go=function(t){var e=this,r=this.index+t;if(!(r<0||r>=this.stack.length)){var n=this.stack[r];this.confirmTransition(n,function(){e.index=r,e.updateRoute(n)})}},e.prototype.getCurrentLocation=function(){var t=this.stack[this.stack.length-1];return t?t.fullPath:"/"},e.prototype.ensureURL=function(){},e}(ee),ie=function(t){void 0===t&&(t={}),this.app=null,this.apps=[],this.options=t,this.beforeHooks=[],this.resolveHooks=[],this.afterHooks=[],this.matcher=z(t.routes||[],this);var e=t.mode||"hash";switch(this.fallback="history"===e&&!Wt&&!1!==t.fallback,this.fallback&&(e="hash"),Bt||(e="abstract"),this.mode=e,e){case"history":this.history=new re(this,t.base);break;case"hash":this.history=new ne(this,t.base,this.fallback);break;case"abstract":this.history=new oe(this,t.base)}},ae={currentRoute:{configurable:!0}};return ie.prototype.match=function(t,e,r){return this.matcher.match(t,e,r)},ae.currentRoute.get=function(){return this.history&&this.history.current},ie.prototype.init=function(t){var e=this;if(this.apps.push(t),!this.app){this.app=t;var r=this.history;if(r instanceof re)r.transitionTo(r.getCurrentLocation());else if(r instanceof ne){var n=function(){r.setupListeners()};r.transitionTo(r.getCurrentLocation(),n,n)}r.listen(function(t){e.apps.forEach(function(e){e._route=t})})}},ie.prototype.beforeEach=function(t){return At(this.beforeHooks,t)},ie.prototype.beforeResolve=function(t){return At(this.resolveHooks,t)},ie.prototype.afterEach=function(t){return At(this.afterHooks,t)},ie.prototype.onReady=function(t,e){this.history.onReady(t,e)},ie.prototype.onError=function(t){this.history.onError(t)},ie.prototype.push=function(t,e,r){this.history.push(t,e,r)},ie.prototype.replace=function(t,e,r){this.history.replace(t,e,r)},ie.prototype.go=function(t){this.history.go(t)},ie.prototype.back=function(){this.go(-1)},ie.prototype.forward=function(){this.go(1)},ie.prototype.getMatchedComponents=function(t){var e=t?t.matched?t:this.resolve(t).route:this.currentRoute;return e?[].concat.apply([],e.matched.map(function(t){return Object.keys(t.components).map(function(e){return t.components[e]})})):[]},ie.prototype.resolve=function(t,e,r){var n=I(t,e||this.history.current,r,this),o=this.match(n,e),i=o.redirectedFrom||o.fullPath;return{location:n,route:o,href:_t(this.history.base,i,this.mode),normalizedTo:n,resolved:o}},ie.prototype.addRoutes=function(t){this.matcher.addRoutes(t),this.history.current!==Ht&&this.history.transitionTo(this.history.getCurrentLocation())},Object.defineProperties(ie.prototype,ae),ie.install=m,ie.version="3.0.1",Bt&&window.Vue&&window.Vue.use(ie),ie});
 
 /***/ }),
-/* 8 */
+
+/***/ 40:
 /***/ (function(module, exports, __webpack_require__) {
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -19470,7 +19873,8 @@ return /******/ (function(modules) { // webpackBootstrap
 //# sourceMappingURL=socket.io.js.map
 
 /***/ }),
-/* 9 */
+
+/***/ 90:
 /***/ (function(module, exports) {
 
 /*axios.get('https://api.github.com/repos/TheDoubleRainbow/GIB/issues')
@@ -19483,7 +19887,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 10 */
+
+/***/ 91:
 /***/ (function(module, exports) {
 
 Vue.component('chat', {
@@ -19512,7 +19917,7 @@ Vue.component('chat', {
 	},
 	methods:{
 		getMessageType(message){
-			return message.user == "Me" ? "chat-message chat-message-byuser" : "chat-message"
+			return message.user == this.$store.getters.userData.login ? "chat-message chat-message-byuser" : "chat-message"
 		},
 		openChat(){
 			var that = this;
@@ -19537,7 +19942,7 @@ Vue.component('chat', {
 					that.messages = messages;
 					document.getElementById(that.chatid).querySelector(".chat-display").scrollTop = 999999;
 				});
-				socket.emit("newMessage", {user: this.user, text: this.input, repo: this.$route.params.owner+"/"+this.$route.params.repo, chat: this.chatid})
+				socket.emit("newMessage", {user: this.$store.getters.userData.login, text: this.input, repo: this.$route.params.owner+"/"+this.$route.params.repo, chat: this.chatid})
 				//this.messages.push({user: "Me", text: this.input})
 				this.input = ""
 			}
@@ -19546,7 +19951,8 @@ Vue.component('chat', {
 })
 
 /***/ }),
-/* 11 */
+
+/***/ 92:
 /***/ (function(module, exports) {
 
 Vue.component('search', {
@@ -19594,7 +20000,8 @@ Vue.component('search', {
 })
 
 /***/ }),
-/* 12 */
+
+/***/ 93:
 /***/ (function(module, exports) {
 
 Vue.component('issues', {
@@ -19661,7 +20068,8 @@ Vue.component('issues', {
 })
 
 /***/ }),
-/* 13 */
+
+/***/ 94:
 /***/ (function(module, exports) {
 
 var loops = 1;
@@ -19727,15 +20135,16 @@ Vue.component('labels', {
 })
 
 /***/ }),
-/* 14 */
+
+/***/ 95:
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(15);
-__webpack_require__(17);
-__webpack_require__(19);
-__webpack_require__(1);
-__webpack_require__(20);
-__webpack_require__(21)
+__webpack_require__(96);
+__webpack_require__(98);
+__webpack_require__(100);
+__webpack_require__(35);
+__webpack_require__(102);
+__webpack_require__(101)
 Vue.use(Router)
 const router = new Router({
 	routes: [
@@ -19779,10 +20188,11 @@ app = new Vue({
 })
 
 /***/ }),
-/* 15 */
+
+/***/ 96:
 /***/ (function(module, exports, __webpack_require__) {
 
-Vuex = __webpack_require__(16);
+Vuex = __webpack_require__(97);
 store = new Vuex.Store({
     state: {
         userData: {token: user_data.token, auth: user_data.auth, login: "", avatar: ""},
@@ -19862,7 +20272,8 @@ store = new Vuex.Store({
 })
 
 /***/ }),
-/* 16 */
+
+/***/ 97:
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -19873,10 +20284,11 @@ store = new Vuex.Store({
 !function(t,e){ true?module.exports=e():"function"==typeof define&&define.amd?define(e):t.Vuex=e()}(this,function(){"use strict";function t(t){$&&(t._devtoolHook=$,$.emit("vuex:init",t),$.on("vuex:travel-to-state",function(e){t.replaceState(e)}),t.subscribe(function(t,e){$.emit("vuex:mutation",t,e)}))}function e(t,e){Object.keys(t).forEach(function(n){return e(t[n],n)})}function n(t){return null!==t&&"object"==typeof t}function o(t){return t&&"function"==typeof t.then}function i(t,e,n){if(e.update(n),n.modules)for(var o in n.modules){if(!e.getChild(o))return;i(t.concat(o),e.getChild(o),n.modules[o])}}function r(t,e){return e.indexOf(t)<0&&e.push(t),function(){var n=e.indexOf(t);n>-1&&e.splice(n,1)}}function s(t,e){t._actions=Object.create(null),t._mutations=Object.create(null),t._wrappedGetters=Object.create(null),t._modulesNamespaceMap=Object.create(null);var n=t.state;a(t,n,[],t._modules.root,!0),c(t,n,e)}function c(t,n,o){var i=t._vm;t.getters={};var r={};e(t._wrappedGetters,function(e,n){r[n]=function(){return e(t)},Object.defineProperty(t.getters,n,{get:function(){return t._vm[n]},enumerable:!0})});var s=j.config.silent;j.config.silent=!0,t._vm=new j({data:{$$state:n},computed:r}),j.config.silent=s,t.strict&&d(t),i&&(o&&t._withCommit(function(){i._data.$$state=null}),j.nextTick(function(){return i.$destroy()}))}function a(t,e,n,o,i){var r=!n.length,s=t._modules.getNamespace(n);if(o.namespaced&&(t._modulesNamespaceMap[s]=o),!r&&!i){var c=m(e,n.slice(0,-1)),f=n[n.length-1];t._withCommit(function(){j.set(c,f,o.state)})}var d=o.context=u(t,s,n);o.forEachMutation(function(e,n){p(t,s+n,e,d)}),o.forEachAction(function(e,n){var o=e.root?n:s+n,i=e.handler||e;h(t,o,i,d)}),o.forEachGetter(function(e,n){l(t,s+n,e,d)}),o.forEachChild(function(o,r){a(t,e,n.concat(r),o,i)})}function u(t,e,n){var o=""===e,i={dispatch:o?t.dispatch:function(n,o,i){var r=v(n,o,i),s=r.payload,c=r.options,a=r.type;return c&&c.root||(a=e+a),t.dispatch(a,s)},commit:o?t.commit:function(n,o,i){var r=v(n,o,i),s=r.payload,c=r.options,a=r.type;c&&c.root||(a=e+a),t.commit(a,s,c)}};return Object.defineProperties(i,{getters:{get:o?function(){return t.getters}:function(){return f(t,e)}},state:{get:function(){return m(t.state,n)}}}),i}function f(t,e){var n={},o=e.length;return Object.keys(t.getters).forEach(function(i){if(i.slice(0,o)===e){var r=i.slice(o);Object.defineProperty(n,r,{get:function(){return t.getters[i]},enumerable:!0})}}),n}function p(t,e,n,o){(t._mutations[e]||(t._mutations[e]=[])).push(function(e){n.call(t,o.state,e)})}function h(t,e,n,i){(t._actions[e]||(t._actions[e]=[])).push(function(e,r){var s=n.call(t,{dispatch:i.dispatch,commit:i.commit,getters:i.getters,state:i.state,rootGetters:t.getters,rootState:t.state},e,r);return o(s)||(s=Promise.resolve(s)),t._devtoolHook?s.catch(function(e){throw t._devtoolHook.emit("vuex:error",e),e}):s})}function l(t,e,n,o){t._wrappedGetters[e]||(t._wrappedGetters[e]=function(t){return n(o.state,o.getters,t.state,t.getters)})}function d(t){t._vm.$watch(function(){return this._data.$$state},function(){},{deep:!0,sync:!0})}function m(t,e){return e.length?e.reduce(function(t,e){return t[e]},t):t}function v(t,e,o){return n(t)&&t.type&&(o=e,e=t,t=t.type),{type:t,payload:e,options:o}}function _(t){j&&t===j||w(j=t)}function y(t){return Array.isArray(t)?t.map(function(t){return{key:t,val:t}}):Object.keys(t).map(function(e){return{key:e,val:t[e]}})}function g(t){return function(e,n){return"string"!=typeof e?(n=e,e=""):"/"!==e.charAt(e.length-1)&&(e+="/"),t(e,n)}}function b(t,e,n){var o=t._modulesNamespaceMap[n];return o}var w=function(t){function e(){var t=this.$options;t.store?this.$store="function"==typeof t.store?t.store():t.store:t.parent&&t.parent.$store&&(this.$store=t.parent.$store)}if(Number(t.version.split(".")[0])>=2)t.mixin({beforeCreate:e});else{var n=t.prototype._init;t.prototype._init=function(t){void 0===t&&(t={}),t.init=t.init?[e].concat(t.init):e,n.call(this,t)}}},$="undefined"!=typeof window&&window.__VUE_DEVTOOLS_GLOBAL_HOOK__,M=function(t,e){this.runtime=e,this._children=Object.create(null),this._rawModule=t;var n=t.state;this.state=("function"==typeof n?n():n)||{}},O={namespaced:{configurable:!0}};O.namespaced.get=function(){return!!this._rawModule.namespaced},M.prototype.addChild=function(t,e){this._children[t]=e},M.prototype.removeChild=function(t){delete this._children[t]},M.prototype.getChild=function(t){return this._children[t]},M.prototype.update=function(t){this._rawModule.namespaced=t.namespaced,t.actions&&(this._rawModule.actions=t.actions),t.mutations&&(this._rawModule.mutations=t.mutations),t.getters&&(this._rawModule.getters=t.getters)},M.prototype.forEachChild=function(t){e(this._children,t)},M.prototype.forEachGetter=function(t){this._rawModule.getters&&e(this._rawModule.getters,t)},M.prototype.forEachAction=function(t){this._rawModule.actions&&e(this._rawModule.actions,t)},M.prototype.forEachMutation=function(t){this._rawModule.mutations&&e(this._rawModule.mutations,t)},Object.defineProperties(M.prototype,O);var E=function(t){this.register([],t,!1)};E.prototype.get=function(t){return t.reduce(function(t,e){return t.getChild(e)},this.root)},E.prototype.getNamespace=function(t){var e=this.root;return t.reduce(function(t,n){return e=e.getChild(n),t+(e.namespaced?n+"/":"")},"")},E.prototype.update=function(t){i([],this.root,t)},E.prototype.register=function(t,n,o){var i=this;void 0===o&&(o=!0);var r=new M(n,o);0===t.length?this.root=r:this.get(t.slice(0,-1)).addChild(t[t.length-1],r),n.modules&&e(n.modules,function(e,n){i.register(t.concat(n),e,o)})},E.prototype.unregister=function(t){var e=this.get(t.slice(0,-1)),n=t[t.length-1];e.getChild(n).runtime&&e.removeChild(n)};var j,C=function(e){var n=this;void 0===e&&(e={}),!j&&"undefined"!=typeof window&&window.Vue&&_(window.Vue);var o=e.plugins;void 0===o&&(o=[]);var i=e.strict;void 0===i&&(i=!1);var r=e.state;void 0===r&&(r={}),"function"==typeof r&&(r=r()||{}),this._committing=!1,this._actions=Object.create(null),this._actionSubscribers=[],this._mutations=Object.create(null),this._wrappedGetters=Object.create(null),this._modules=new E(e),this._modulesNamespaceMap=Object.create(null),this._subscribers=[],this._watcherVM=new j;var s=this,u=this,f=u.dispatch,p=u.commit;this.dispatch=function(t,e){return f.call(s,t,e)},this.commit=function(t,e,n){return p.call(s,t,e,n)},this.strict=i,a(this,r,[],this._modules.root),c(this,r),o.forEach(function(t){return t(n)}),j.config.devtools&&t(this)},x={state:{configurable:!0}};x.state.get=function(){return this._vm._data.$$state},x.state.set=function(t){},C.prototype.commit=function(t,e,n){var o=this,i=v(t,e,n),r=i.type,s=i.payload,c=(i.options,{type:r,payload:s}),a=this._mutations[r];a&&(this._withCommit(function(){a.forEach(function(t){t(s)})}),this._subscribers.forEach(function(t){return t(c,o.state)}))},C.prototype.dispatch=function(t,e){var n=this,o=v(t,e),i=o.type,r=o.payload,s={type:i,payload:r},c=this._actions[i];if(c)return this._actionSubscribers.forEach(function(t){return t(s,n.state)}),c.length>1?Promise.all(c.map(function(t){return t(r)})):c[0](r)},C.prototype.subscribe=function(t){return r(t,this._subscribers)},C.prototype.subscribeAction=function(t){return r(t,this._actionSubscribers)},C.prototype.watch=function(t,e,n){var o=this;return this._watcherVM.$watch(function(){return t(o.state,o.getters)},e,n)},C.prototype.replaceState=function(t){var e=this;this._withCommit(function(){e._vm._data.$$state=t})},C.prototype.registerModule=function(t,e,n){void 0===n&&(n={}),"string"==typeof t&&(t=[t]),this._modules.register(t,e),a(this,this.state,t,this._modules.get(t),n.preserveState),c(this,this.state)},C.prototype.unregisterModule=function(t){var e=this;"string"==typeof t&&(t=[t]),this._modules.unregister(t),this._withCommit(function(){var n=m(e.state,t.slice(0,-1));j.delete(n,t[t.length-1])}),s(this)},C.prototype.hotUpdate=function(t){this._modules.update(t),s(this,!0)},C.prototype._withCommit=function(t){var e=this._committing;this._committing=!0,t(),this._committing=e},Object.defineProperties(C.prototype,x);var k=g(function(t,e){var n={};return y(e).forEach(function(e){var o=e.key,i=e.val;n[o]=function(){var e=this.$store.state,n=this.$store.getters;if(t){var o=b(this.$store,0,t);if(!o)return;e=o.context.state,n=o.context.getters}return"function"==typeof i?i.call(this,e,n):e[i]},n[o].vuex=!0}),n}),G=g(function(t,e){var n={};return y(e).forEach(function(e){var o=e.key,i=e.val;n[o]=function(){for(var e=[],n=arguments.length;n--;)e[n]=arguments[n];var o=this.$store.commit;if(t){var r=b(this.$store,0,t);if(!r)return;o=r.context.commit}return"function"==typeof i?i.apply(this,[o].concat(e)):o.apply(this.$store,[i].concat(e))}}),n}),S=g(function(t,e){var n={};return y(e).forEach(function(e){var o=e.key,i=e.val;i=t+i,n[o]=function(){if(!t||b(this.$store,0,t))return this.$store.getters[i]},n[o].vuex=!0}),n}),A=g(function(t,e){var n={};return y(e).forEach(function(e){var o=e.key,i=e.val;n[o]=function(){for(var e=[],n=arguments.length;n--;)e[n]=arguments[n];var o=this.$store.dispatch;if(t){var r=b(this.$store,0,t);if(!r)return;o=r.context.dispatch}return"function"==typeof i?i.apply(this,[o].concat(e)):o.apply(this.$store,[i].concat(e))}}),n});return{Store:C,install:_,version:"3.0.1",mapState:k,mapMutations:G,mapGetters:S,mapActions:A,createNamespacedHelpers:function(t){return{mapState:k.bind(null,t),mapGetters:S.bind(null,t),mapMutations:G.bind(null,t),mapActions:A.bind(null,t)}}}});
 
 /***/ }),
-/* 17 */
+
+/***/ 98:
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(18);
+__webpack_require__(99);
 Repo = Vue.component('repo', {
 	template: `<div>	
 					<router-view v-if="repoData.available"></router-view>
@@ -19935,7 +20347,8 @@ Repo = Vue.component('repo', {
 })
 
 /***/ }),
-/* 18 */
+
+/***/ 99:
 /***/ (function(module, exports) {
 
 Vue.component('reponotfound', {
@@ -19944,350 +20357,6 @@ Vue.component('reponotfound', {
 				</div>`,
 })
 
-/***/ }),
-/* 19 */
-/***/ (function(module, exports) {
-
-IssuesBlock = Vue.component('issuesblock', {
-	template: `<div>
-
-					<div class = "columns is-centered animated pulse">
-						<div id="reviews-greeting" class = "column is-6-desktop is-8-tablet">
-							You are looking at <span id="reviews-reponame">{{$route.params.owner}}/{{$route.params.repo}}</span> repo. {{reviewsAmount}}
-						</div>
-						<div class = "column is-1-desktop is-2-tablet">
-							<div class = "control">
-								<button v-on:click="loadViews()" id="reviews-button" class="button is-info">Reviews</button>
-							</div>
-						</div>
-						<div class = "column is-1-desktop is-2-tablet">
-							<div class = "control">
-								<button v-on:click="loadRepodata()" id="repodata-button" class="button is-info">Repo data</button>
-							</div>
-						</div>
-					</div>
-
-					<div class = "columns is-centered animated pulse">
-						<div class = "column.is-2" id = "labels">
-							<labels></labels>
-						</div>
-						<div class = "column is-7" id = "issues">
-							<issues></issues>
-						</div>
-					</div>
-				</div>`,
-	beforeRouteUpdate (to, from, next) {
-	  	},
-	data: function(){
-			/*return {
-						repoData: {
-							owner: "",
-							repo: "",
-							repoAvailable: false
-						}
-					}
-				},*/
-				return {
-					repoData: {},
-					reviewsAmount: ""
-				};
-			},
-	props:['repodata'],
-	watch: {
-		repodata: function(){
-			this.repoData = this.repodata;
-			}
-	},
-	created: function(){
-			//this.repoData = this.repodata;
-			this.getReviewsAmount()
-			},
-	methods:{
-		getReviewsAmount: function(){
-			var that = this;
-			axios.get(`getReviews/${that.$route.params.owner}/${that.$route.params.repo}`)
-				  .then(function (response) {
-				  	var revAmount = response.data.length;
-				  	let answer = "It has ";
-				  	if(revAmount == 0){
-				  		answer += "no reviews";
-				  	}
-				  	else if(revAmount == 1){
-				  		answer += revAmount + " review";
-				  	}
-				  	else{
-				  		answer += revAmount + " reviews";
-				  	}
-				  	that.reviewsAmount = answer;
-				  })
-				  .catch(function (error) {
-				    console.log(error);
-				  });
-		},
-		loadViews: function(){
-			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/reviews`);
-		},
-		loadRepodata: function(){
-			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/repodata`);
-		}
-	}
-
-})
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports) {
-
-Start = Repo = Vue.component('start', {
-	template: `<div>
-					<div v-if="userData.auth">
-						<div id="welcome">Welcome to GIB</div> 
-						<search></search>
-					</div>
-					<div v-if="userData.auth == false">
-						<a href = "http://github.com/login/oauth/authorize?client_id=f343de2cdd05ffd0d470">GITHUB</a>
-					</div>
-				</div>`,
-	computed: {
-	    	userData: function () {
-	      		return this.$store.getters.userData;
-	      		//return [];
-	    	}
-  	}
-
-});
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports) {
-
-Repodata = Vue.component('repodata', {
-	template: `<div>
-				<div class = "columns is-centered">
-								
-					<div class = "column is-8 is-8-desktop is-12-tablet">
-							<div class = "control">
-								<button v-on:click="loadIssues()" id="issues-button" class="button is-info">Back to issues</button>
-							</div>
-					</div>
-				</div>
-				<div class="loading-div-repodata" v-if="loaded!=2"><img class="loading-img" src="/img/loading.gif" /></div>
-				<div v-if="loaded==2" id = "reviews" class = "columns is-centered">
-					<div class = "column is-4-widescreen is-4-fullhd is-5-desktop">
-						<div :class="getFIRatioType()">
-							<div v-if="showFI">
-							<div v-if="enoughfi" class="fi-header">FI Ratio: {{fiRatio}}% ({{fitype}})</div>
-							<div class="fi-body">
-								<div v-if="!enoughfi"> Not enough data</div>
-								<div v-if="enoughfi">Usualy it takes {{fidata.average}} days to integrate feature for this repository.</div>
-							</div> 
-							<div v-if="enoughfi" class="fi-footer">
-								<div class="fi-issue">Fastest issue: {{fidata.best}}</div><div class="fi-issue fi-issue-worst">Longest issue: {{fidata.worst}}</div>
-							</div>
-							</div>
-						</div>
-					</div>
-					<div class = "column is-4-widescreen is-4-fullhd is-5-desktop">
-						<div :class="getDFRatioType()">
-							<div v-if="showDF">
-							<div v-if="enoughdf" class="fi-header">DF Ratio: {{dfRatio}}% ({{dftype}})</div>
-							<div class="fi-body">
-								<div v-if="!enoughdf"> Not enough data</div>
-								<div v-if="enoughdf">Usualy it takes {{dfdata.average}} days to fix bug for this repository.</div>
-							</div> 
-							<div v-if="enoughdf" class="fi-footer">
-								<div class="fi-issue">Fastest issue: {{dfdata.best}}</div><div class="fi-issue fi-issue-worst">Longest issue: {{dfdata.worst}}</div>
-							</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div></div></div>`,
-	data: function() {
-		return {
-			loaded: 0,
-			showFI: false,
-			showDF: false,
-			fidata: {
-				data: [],
-				worst: 190,
-				best: 1,
-				average: 0
-			},
-			fiRatio: 0,
-			enoughfi: false,
-			fitype: "",
-			dfdata: {
-				data: [],
-				worst: 450,
-				best: 1,
-				average: 0
-			},
-			dfRatio: 0,
-			enoughdf: false,
-			dftype: ""
-		}
-	},
-	methods:{
-		loadIssues: function(){
-			this.$router.push(`/${this.$route.params.owner}/${this.$route.params.repo}/issues`);
-		},
-		calcFIRatio: function(){
-			let worst = 0;
-			let best = 999999999;
-			for(var i = 0; i < this.fidata.data.length; i++){
-				if(worst < this.fidata.data[i]){
-					worst = this.fidata.data[i]
-				}
-				if(best > this.fidata.data[i]){
-					best = this.fidata.data[i]
-				}
-			}
-			this.fidata.best = best;
-			this.fidata.worst = worst;
-			this.fiRatio = 0;
-			for (var i = 0; i < this.fidata.data.length; i++) {
-				this.fiRatio += this.fidata.data[i]
-			}
-			this.fiRatio = this.fiRatio/this.fidata.data.length;
-			this.fidata.average = this.fiRatio.toFixed(3);
-			this.fiRatio = 100 - (this.fiRatio/this.fidata.worst).toFixed(3)*100
-			this.showFI = true;
-		},
-		getFIRatioType: function(){
-			let fitype = '';
-			if(this.fiRatio < 25){
-				fitype =  "fi-terrible";
-				this.fitype = "terrible";
-			}
-			else if(this.fiRatio > 25 && this.fiRatio < 50 ){
-				fitype =  "fi-bad";
-				this.fitype = "bad";
-			}
-			else if(this.fiRatio > 50 && this.fiRatio < 75 ){
-				fitype =  "fi-average";
-				this.fitype = "average";
-			}
-			else if(this.fiRatio > 75 && this.fiRatio < 87.5 ){
-				fitype =  "fi-good";
-				this.fitype = "good";
-			}
-			else{
-				fitype =  "fi-awesome";
-				this.fitype = "awesome";
-			}
-			return fitype += " firatio"
-		},
-		calcDFRatio: function(){
-			let worst = 0;
-			let best = 999999999;
-			for(var i = 0; i < this.dfdata.data.length; i++){
-				if(worst < this.dfdata.data[i]){
-					worst = this.dfdata.data[i]
-				}
-				if(best > this.dfdata.data[i]){
-					best = this.dfdata.data[i]
-				}
-			}
-			this.dfdata.best = best;
-			this.dfdata.worst = worst;
-			this.dfRatio = 0;
-			for (var i = 0; i < this.dfdata.data.length; i++) {
-				this.dfRatio += this.dfdata.data[i]
-			}
-			this.dfRatio = this.dfRatio/this.dfdata.data.length;
-			this.dfdata.average = this.dfRatio.toFixed(3);
-			this.dfRatio = 100 - ((this.dfRatio/this.dfdata.worst)*100).toFixed(2)
-			this.showDF = true;
-		},
-		getDFRatioType: function(){
-			let dftype = '';
-			if(this.dfRatio < 25){
-				dftype =  "fi-terrible";
-				this.dftype = "terrible";
-			}
-			else if(this.dfRatio > 25 && this.dfRatio < 50 ){
-				dftype =  "fi-bad";
-				this.dftype = "bad";
-			}
-			else if(this.dfRatio > 50 && this.dfRatio < 75 ){
-				dftype =  "fi-average";
-				this.dftype = "average";
-			}
-			else if(this.dfRatio > 75 && this.dfRatio < 87.5 ){
-				dftype =  "fi-good";
-				this.dftype = "good";
-			}
-			else{
-				dftype =  "fi-awesome";
-				this.dftype = "awesome";
-			}
-			return dftype += " firatio"
-		},
-		getDif(raw1, raw2){
-			var dif = 0;
-			var d = {}; var d2 = {};
-			d.raw = raw1
-			d2.raw = raw2
-			d.year = d.raw.split("-")[0]*1;
-			d.month = d.raw.split("-")[1]*1;
-			d.day = (d.raw.split("-")[2][0]+d.raw.split("-")[2][1])*1;
-			d2.year = d2.raw.split("-")[0]*1;
-			d2.month = d2.raw.split("-")[1]*1;
-			d2.day = (d2.raw.split("-")[2][0]+d2.raw.split("-")[2][1])*1;
-			if(d.day-d2.day != 0){
-				dif += d.day-d2.day;
-				if(d.month - d2.month != 0){
-					dif += (d.month-d2.month)*30;
-					if(d.year-d2.year != 0){
-						dif += (d.year - d2.year)*365;
-					}
-				}
-			}
-			return dif
-		},
-		getData: function(){
-			this.loaded = 0;
-			var that = this;
-			axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/issues?state=closed`)
-	                      .then(function (response){
-	                        response.data.forEach(function(item, i, arr) {
-	                        	that.fidata.data.push(that.getDif(item.closed_at, item.created_at));
-	                        });
-	                        that.calcFIRatio();
-	                        if(that.fidata.data.length > 5){
-	                        	that.enoughfi = true;
-	                        }
-	                        that.loaded++
-	                        console.log(that.loaded)
-	                      })
-	                      .catch(function (error) {
-	                        console.log("error");
-	                     });
-	        axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/issues?labels=Type:%20bug&&state=closed`)
-	                      .then(function (response){
-	                        response.data.forEach(function(item, i, arr) {
-	                        	that.dfdata.data.push(that.getDif(item.closed_at, item.created_at));
-	                        });
-	                        that.calcDFRatio();
-	                        if(that.dfdata.data.length > 5){
-	                        	that.enoughdf = true;
-	                        }
-	                        that.loaded++
-	                        console.log(that.loaded)
-	                      })
-	                      .catch(function (error) {
-	                        console.log("error");
-	                     });
-
-		}
-	},
-	created: function(){
-		this.calcFIRatio();
-		this.calcDFRatio();
-		this.getData();
-	}
-})
-
 /***/ })
-/******/ ]);
+
+/******/ });

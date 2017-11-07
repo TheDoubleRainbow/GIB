@@ -8,8 +8,8 @@ Repodata = Vue.component('repodata', {
 							</div>
 					</div>
 				</div>
-				<div class="loading-div-repodata" v-if="loaded!=2"><img class="loading-img" src="/img/loading.gif" /></div>
-				<div v-if="loaded==2" id = "reviews" class = "columns is-centered">
+				<div class="loading-div-repodata" v-if="loaded<2"><img class="loading-img" src="/img/loading.gif" /></div>
+				<div v-if="loaded>2" id = "reviews" class = "columns is-centered">
 					<div class = "column is-4-widescreen is-4-fullhd is-5-desktop">
 						<div :class="getFIRatioType()">
 							<div v-if="showFI">
@@ -87,7 +87,7 @@ Repodata = Vue.component('repodata', {
 				this.fiRatio += this.fidata.data[i]
 			}
 			this.fiRatio = this.fiRatio/this.fidata.data.length;
-			this.fidata.average = this.fiRatio.toFixed(3);
+			this.fidata.average = this.fiRatio.toFixed(1);
 			this.fiRatio = 100 - (this.fiRatio/this.fidata.worst).toFixed(3)*100
 			this.showFI = true;
 		},
@@ -133,7 +133,7 @@ Repodata = Vue.component('repodata', {
 				this.dfRatio += this.dfdata.data[i]
 			}
 			this.dfRatio = this.dfRatio/this.dfdata.data.length;
-			this.dfdata.average = this.dfRatio.toFixed(3);
+			this.dfdata.average = this.dfRatio.toFixed(1);
 			this.dfRatio = 100 - ((this.dfRatio/this.dfdata.worst)*100).toFixed(2)
 			this.showDF = true;
 		},
@@ -174,34 +174,47 @@ Repodata = Vue.component('repodata', {
 			d2.day = (d2.raw.split("-")[2][0]+d2.raw.split("-")[2][1])*1;
 			if(d.day-d2.day != 0){
 				dif += d.day-d2.day;
-				if(d.month - d2.month != 0){
-					dif += (d.month-d2.month)*30;
-					if(d.year-d2.year != 0){
-						dif += (d.year - d2.year)*365;
-					}
-				}
+			}
+			if(d.month - d2.month != 0){
+				dif += (d.month-d2.month)*30;
+			}
+			if((d.year-d2.year) != 0){
+				dif += (d.year - d2.year)*365;
 			}
 			return dif
 		},
 		getData: function(){
 			this.loaded = 0;
 			var that = this;
-			axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/issues?state=closed`)
+			var loopfi = 1;
+			var loopdfr = 1;
+			var loopdfn = 1;
+			function loadfi(){
+				axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/issues?state=closed&&access_token=${user_data.token}&&page=${loopfi}`)
 	                      .then(function (response){
-	                        response.data.forEach(function(item, i, arr) {
+	                      	response.data.forEach(function(item, i, arr) {
 	                        	that.fidata.data.push(that.getDif(item.closed_at, item.created_at));
 	                        });
 	                        that.calcFIRatio();
 	                        if(that.fidata.data.length > 5){
 	                        	that.enoughfi = true;
 	                        }
-	                        that.loaded++
-	                        console.log(that.loaded)
+	                        if(response.data.length == 30 && loopfi < 51){
+	                        	loopfi++
+	                        	loadfi();
+	                        }
+	                        else{
+	                        	that.loaded++
+	                        	console.log(that.fidata.length)
+	                        }
 	                      })
 	                      .catch(function (error) {
 	                        console.log("error");
 	                     });
-	        axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/issues?labels=Type:%20bug&&state=closed`)
+			}
+			function loaddf(){
+				function loaddfr(){
+					axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/issues?labels=Type:%20bug&&state=closed&&access_token=${user_data.token}&&page=${loopdfr}`)
 	                      .then(function (response){
 	                        response.data.forEach(function(item, i, arr) {
 	                        	that.dfdata.data.push(that.getDif(item.closed_at, item.created_at));
@@ -210,18 +223,51 @@ Repodata = Vue.component('repodata', {
 	                        if(that.dfdata.data.length > 5){
 	                        	that.enoughdf = true;
 	                        }
-	                        that.loaded++
-	                        console.log(that.loaded)
+	                        if(response.data.length == 30){
+	                        	loaddr();
+	                        	loopdfr++
+	                        }
+	                        else{
+	                        	that.loaded++;
+	                        }
 	                      })
 	                      .catch(function (error) {
 	                        console.log("error");
 	                     });
-
+				}
+				function loaddfn(){
+					axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}/issues?labels=bug&&state=closed&&access_token=${user_data.token}&&page=${loopdfn}`)
+	                      .then(function (response){
+	                        response.data.forEach(function(item, i, arr) {
+	                        	that.dfdata.data.push(that.getDif(item.closed_at, item.created_at));
+	                        });
+	                        that.calcDFRatio();
+	                        if(that.dfdata.data.length > 5){
+	                        	that.enoughdf = true;
+	                        }
+	                        if(response.data.length == 30){
+	                        	loaddf();
+	                        	loopdfn++
+	                        }
+	                        else{
+	                        	that.loaded++;
+	                        }
+	                      })
+	                      .catch(function (error) {
+	                        console.log("error");
+	                     });
+				}
+				loaddfr();
+				loaddfn();
+			}
+			loaddf();
+			loadfi();
 		}
 	},
 	created: function(){
 		this.calcFIRatio();
 		this.calcDFRatio();
 		this.getData();
+		this.getDif("2016-07-14T12:11:30Z", "2015-07-26T12:11:30Z")
 	}
 })
