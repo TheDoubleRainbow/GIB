@@ -27,7 +27,12 @@ Vue.component('issues', {
 							</div>
 							<chat :chatid="'chat'+issue.id">
 							</chat>
-				</div></div>`,
+				</div>
+				<div id="paginator">
+				<div id="prev">Prev page</div>
+				<div id="next">Next page</div>
+				</div>
+				</div>`,
 	data: function(){
 		return {
 			issues: [],
