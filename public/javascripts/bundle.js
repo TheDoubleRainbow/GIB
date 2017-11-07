@@ -19973,6 +19973,8 @@ store = new Vuex.Store({
                 for(var i = 0; i < state.labels[typeIndex].subtypes.length; i++){
                     state.labels[typeIndex].subtypes[i].selected = selected;
                 }
+
+
             } else{
                 state.labels[typeIndex].subtypes[subTypeIndex].selected = selected;
             }
