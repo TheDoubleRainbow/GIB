@@ -60,9 +60,23 @@ Vue.component('issues', {
 			if(issue.opened == false || issue.opened == undefined || event.target.innerHTML == "View on Github" || event.target.innerHTML == "View pull request"){
 				issue.opened = true;
 				//.. load messages
-				issue.messages = [{user: {name: "vasya"}, content: "Lorem ipsum dolor idi naxuy Vivamus eleifend scelerisque neque et facilisis. Nullam vel quam nec arcu elementum tempor. Vivamus gravida ipsum ut nisl blandit dignissim."},
-								{user: {name: "Lil Pump"}, content: "EDU V MAGAZIN GUCCI V ZHMERINKE"}
-								 ];
+				issue.messages = [];
+				console.log("loadMessages");
+				axios.get(`${issue.comments_url}?access_token=${this.$store.getters.userData.token}`)
+
+		              .then(function (response){
+		                console.log(response);
+		                response.data.forEach(function(item, i, arr){
+		                	//console.log(item);
+		                	issue.messages.push({user: {name: item.user.login}, content: item.body});
+
+		                });
+
+		              })
+		              .catch(function (error) {
+		             //   labels = [];
+		                console.log(error);
+		            });
 				//.. 
 				issue.html = document.getElementById("id-"+issue.id);
 				issue.html.className = "issue-opened"
@@ -89,7 +103,7 @@ Vue.component('issues', {
 			axios.get(url)
 
               .then(function (response){
-                console.log(response);
+                //console.log(response);
                 response.data.forEach(function(item, i, arr){
                 	//console.log(item);
                 	that.issues.push({id: item.id, url: item.url, state: item.state, title: item.title, comments_url: item.comments_url, messages: [], body: item.body, user: {name: item.user.login, avatar: item.user.avatar_url}, labels: item.labels, pullrequest: item.pull_request});
