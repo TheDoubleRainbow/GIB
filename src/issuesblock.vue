@@ -48,28 +48,24 @@ IssuesBlock = Vue.component('issuesblock', {
 			this.repoData = this.repodata;
 			}
 	},
-	created: function(){
+	updated: function(){
 
 			var that = this;
 
-			/*if(that.$route.query.labels){
+			if(that.$route.query.labels){
 				that.$route.query.labels.split(',').forEach(function(item, i, arr) {
-                        var typeArray = item.name.split(": ");
-                        var found = false;
-                        that.$store.labels.forEach(function(item1, i1, arr1){
+                        var typeArray = item.split(": ");
+                        that.$store.getters.labels.forEach(function(item1, i1, arr1){
                             if(item1.type == typeArray[0]){
-                                //labels[i1].subtypes.push({subtype: typeArray[1], selected: false});
-                                //that.
-                                found = true;
+                            	item1.subtypes.forEach(function(item2, i2, arr2) {	
+                            		if(item2.subtype == typeArray[1]){
+                            			that.$store.dispatch('selectLabel', {typeIndex: i1, subTypeIndex: i2, selected: true});
+                            		}
+                            	});
                             }
                         });
-                        if(found == false){
-                            var subtype = typeArray[1];// ? typeArray[1];
-                            labels.push({name: item.name, type: typeArray[0], subtypes: subtype ? [{subtype: subtype, selected: false}] : [], color: item.color});
-                        }
-                    });
-			}*/
-
+                });
+			}
 			this.getReviewsAmount()
 			},
 	methods:{

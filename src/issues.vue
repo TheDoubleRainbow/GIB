@@ -8,7 +8,7 @@ Vue.component('issues', {
 								<div class="issue-header-pullrequest" v-if="issue.pullrequest"><a :href="issue.pullrequest.url">View pull request</a></div>
 								<div class="issue-header-labels">
 									<div class="issue-header-label" v-for="label in issue.labels">
-										<div class="issue-header-label-name" :style="{background: '#'+label.colour}"> {{label.name}} </div>
+										<div class="issue-header-label-name" :style="{background: '#'+label.color}"> {{label.name}} </div>
 									</div>
 								</div>
 							</div>
@@ -28,10 +28,23 @@ Vue.component('issues', {
 				</div></div>`,
 	data: function(){
 		return {
-			issues: [{id: 0, url: "#", state: "closed", title: "Issue #1", messages: [], body: "ya kuryu i mne pohui", user: {name: "petya"}, labels: [{id: 1, url: "#", name: "Bug", colour: "f29513"}, {id: 2, url: "#", name: "Feature", colour: "f29513"}], pullrequest: {user: {name: "kolya"}, url: "#123"}}, {id: 1, url: "#", state: "open", title: "Eshkere Issue #2 Roman Pidor", body: "ya buhayu i mne pohui", user: {name: "petya"}, labels: [{id: 1, url: "#", name: "Bug", colour: "f29513"}, {id: 2, url: "#", name: "Feature", colour: "f29513"}], pullrequest: false}]
-
+			issues: [],
 		}
 	},
+	created: function(){
+		this.loadIssues();
+	},
+	watch: {
+	    '$route' (to, from) {
+
+	    	//console.log("load_iisues")
+	    	this.loadIssues();
+
+
+	      //this.issues =
+	    }
+  	},
+
 	methods:{
 		stateBg: function(type){
 			return type =='open' ? "#3CCE7D" : "#C8363D"
@@ -56,7 +69,31 @@ Vue.component('issues', {
 				issue.html.querySelector(".issue-body").style.display = "none"; issue.html.querySelector(".issue-header-url").style.display = "none"; if(issue.pullrequest){issue.html.querySelector(".issue-header-pullrequest").style.display = "none"} issue.html.querySelector(".chat-open").style.display = "none";
 					
 			}
-			
+		},
+		loadIssues: function(){
+			this.issues = [];
+			console.log("load_iisues");
+			//console.log(this.$route.query.labels);
+			var that = this;
+			var labels = this.$route.query.labels ? `&labels=${this.$route.query.labels}` : "";
+			var page = this.$route.query.page ? `&page=${this.$route.query.page}` : "";
+			var url = `https://api.github.com/repos/${this.$store.getters.repoData.owner}/${this.$store.getters.repoData.repo}/issues?access_token=${this.$store.getters.userData.token}${labels}${page}&state=all`
+			console.log(url);
+			axios.get(url)
+
+              .then(function (response){
+                console.log(response);
+                response.data.forEach(function(item, i, arr){
+                	//console.log(item);
+                	that.issues.push({id: item.id, url: item.url, state: item.state, title: item.title, comments_url: item.comments_url, messages: [], body: item.body, user: {name: item.user.login, avatar: item.user.avatar_url}, labels: item.labels, pullrequest: item.pull_request});
+
+                });
+
+              })
+              .catch(function (error) {
+             //   labels = [];
+                console.log(error);
+            });
 		}
 	}
 })
