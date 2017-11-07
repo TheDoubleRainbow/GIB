@@ -19604,16 +19604,18 @@ Vue.component('issues', {
 							<div class="issue-header" @click="openIssue(issue, $event)">
 								<div class="issue-header-status" :style="{background: stateBg(issue.state)}"></div>
 								<div class="issue-header-title"> {{issue.title}} </div>
-								<div class="issue-header-url"><a :href="issue.url">View on Github</a></div>
-								<div class="issue-header-pullrequest" v-if="issue.pullrequest"><a :href="issue.pullrequest.url">View pull request</a></div>
+								<div class="issue-header-url"><a :href="'http://github.com/'+$store.getters.repoData.owner+'/'+$store.getters.repoData.repo+'/pull/'+issue.url.split('issues')[1]">View on Github</a></div>
+
+								<div class="issue-header-pullrequest" v-if="issue.pullrequest"><a :href="'http://github.com/'+$store.getters.repoData.owner+'/'+$store.getters.repoData.repo+'/pull/'+issue.pullrequest.url.split('pulls')[1]">View pull request</a></div>
 								<div class="issue-header-labels">
+
 									<div class="issue-header-label" v-for="label in issue.labels">
 										<div class="issue-header-label-name" :style="{background: '#'+label.color}"> {{label.name}} </div>
 									</div>
 								</div>
 							</div>
 							<div class="issue-body">
-								<div class="issue-message-posted-by">Posted by {{issue.user.name}}</div>
+								<div class="issue-message-posted-by">Created by <a :href="'https://github.com/' + issue.user.name"><img :src="issue.user.avatar" />{{issue.user.name}}</a></div>
 								<div class="issue-message issue-first-message"></div>
 								<div class="issue-messages">
 									<div class issue-message-wrap v-for="message in issue.messages">
@@ -19719,9 +19721,63 @@ Vue.component('labels', {
 			</div>`,
 	methods: {
 		toogle: function(event, typeindex){
+			/*var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
+			if(subMenu != undefined){
+				if(event.target.className[0] == "s"){
+					if(this.$store.getters.labels[typeindex].selected == undefined){
+						this.$store.getters.labels[typeindex].selected = true
+					}
+					else{
+						this.$store.getters.labels[typeindex].selected = !this.$store.getters.labels[typeindex].selected
+					}
+					for(var i = 0; i < this.$store.getters.labels[typeindex].subtypes.length; i++){
+						this.$store.getters.labels[typeindex].subtypes[i].selected = !this.$store.getters.labels[typeindex].subtypes[i].selected
+					}
+
+					//console.log(this.$store.getters.labels);
+					this.route();
+				}
+				else{
+					if (subMenu.classList.contains('selected')) {
+			            subMenu.classList.remove("selected");
+			        } else {
+			            subMenu.classList.add("selected");
+			        }
+				}
+			}
+			else{
+				//Request for empty sebtypes
+				if(this.$store.getters.labels[typeindex].selected == undefined){
+						this.$store.getters.labels[typeindex].selected = true
+					}
+					else{
+						this.$store.getters.labels[typeindex].selected = !this.$store.getters.labels[typeindex].selected
+					}
+					for(var i = 0; i < this.$store.getters.labels[typeindex].subtypes.length; i++){
+						this.$store.getters.labels[typeindex].subtypes[i].selected = !this.$store.getters.labels[typeindex].subtypes[i].selected
+					}
+
+					//console.log(this.$store.getters.labels);
+					this.route();
+				
+
+			}*/
+
+
 			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
 			if(subMenu != undefined){
 				if(event.target.className[0] == "s"){
+					//if(this.$store.getters.labels[typeindex].selected == undefined){
+					//	this.$store.getters.labels[typeindex].selected = true
+					//}
+					//else{
+					//	this.$store.getters.labels[typeindex].selected = !this.$store.getters.labels[typeindex].selected
+					//}
+					//for(var i = 0; i < this.$store.getters.labels[typeindex].subtypes.length; i++){
+					//	this.$store.getters.labels[typeindex].subtypes[i].selected = !this.$store.getters.labels[typeindex].subtypes[i].selected
+					//}
+
+					//console.log(this.$store.getters.labels);
 					var selected = !this.selected(typeindex, -1);
 	    			this.$store.dispatch('selectLabel', {typeIndex: typeindex, subTypeIndex: -1, selected});
 
@@ -19736,15 +19792,22 @@ Vue.component('labels', {
 				}
 			}
 			else{
-				var selected = !this.selected(typeindex, -1);
-	    		this.$store.dispatch('selectLabel', {typeIndex: typeindex, subTypeIndex: -1, selected});
 
-				this.route();
+				var selected = !this.selected(typeindex, -1);
+	    			this.$store.dispatch('selectLabel', {typeIndex: typeindex, subTypeIndex: -1, selected});
+
+					this.route();
+
+
 			}
+
+
 	    },
 	    selectSubLabel(typeIndex, subTypeIndex){
 	    	var selected = !this.selected(typeIndex, subTypeIndex);
 	    	this.$store.dispatch('selectLabel', {typeIndex, subTypeIndex, selected});
+
+	    	//console.log(this.$router.)
 	    	this.route();
 	    },
 

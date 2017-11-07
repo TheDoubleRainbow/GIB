@@ -15,9 +15,63 @@ Vue.component('labels', {
 			</div>`,
 	methods: {
 		toogle: function(event, typeindex){
+			/*var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
+			if(subMenu != undefined){
+				if(event.target.className[0] == "s"){
+					if(this.$store.getters.labels[typeindex].selected == undefined){
+						this.$store.getters.labels[typeindex].selected = true
+					}
+					else{
+						this.$store.getters.labels[typeindex].selected = !this.$store.getters.labels[typeindex].selected
+					}
+					for(var i = 0; i < this.$store.getters.labels[typeindex].subtypes.length; i++){
+						this.$store.getters.labels[typeindex].subtypes[i].selected = !this.$store.getters.labels[typeindex].subtypes[i].selected
+					}
+
+					//console.log(this.$store.getters.labels);
+					this.route();
+				}
+				else{
+					if (subMenu.classList.contains('selected')) {
+			            subMenu.classList.remove("selected");
+			        } else {
+			            subMenu.classList.add("selected");
+			        }
+				}
+			}
+			else{
+				//Request for empty sebtypes
+				if(this.$store.getters.labels[typeindex].selected == undefined){
+						this.$store.getters.labels[typeindex].selected = true
+					}
+					else{
+						this.$store.getters.labels[typeindex].selected = !this.$store.getters.labels[typeindex].selected
+					}
+					for(var i = 0; i < this.$store.getters.labels[typeindex].subtypes.length; i++){
+						this.$store.getters.labels[typeindex].subtypes[i].selected = !this.$store.getters.labels[typeindex].subtypes[i].selected
+					}
+
+					//console.log(this.$store.getters.labels);
+					this.route();
+				
+
+			}*/
+
+
 			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
 			if(subMenu != undefined){
 				if(event.target.className[0] == "s"){
+					//if(this.$store.getters.labels[typeindex].selected == undefined){
+					//	this.$store.getters.labels[typeindex].selected = true
+					//}
+					//else{
+					//	this.$store.getters.labels[typeindex].selected = !this.$store.getters.labels[typeindex].selected
+					//}
+					//for(var i = 0; i < this.$store.getters.labels[typeindex].subtypes.length; i++){
+					//	this.$store.getters.labels[typeindex].subtypes[i].selected = !this.$store.getters.labels[typeindex].subtypes[i].selected
+					//}
+
+					//console.log(this.$store.getters.labels);
 					var selected = !this.selected(typeindex, -1);
 	    			this.$store.dispatch('selectLabel', {typeIndex: typeindex, subTypeIndex: -1, selected});
 
@@ -32,15 +86,22 @@ Vue.component('labels', {
 				}
 			}
 			else{
-				var selected = !this.selected(typeindex, -1);
-	    		this.$store.dispatch('selectLabel', {typeIndex: typeindex, subTypeIndex: -1, selected});
 
-				this.route();
+				var selected = !this.selected(typeindex, -1);
+	    			this.$store.dispatch('selectLabel', {typeIndex: typeindex, subTypeIndex: -1, selected});
+
+					this.route();
+
+
 			}
+
+
 	    },
 	    selectSubLabel(typeIndex, subTypeIndex){
 	    	var selected = !this.selected(typeIndex, subTypeIndex);
 	    	this.$store.dispatch('selectLabel', {typeIndex, subTypeIndex, selected});
+
+	    	//console.log(this.$router.)
 	    	this.route();
 	    },
 
