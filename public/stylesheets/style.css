@@ -6466,4 +6466,15 @@ body {
 .label-subtype span {
   transition-duration: 0.1s; }
 
+#paginator {
+  text-align: center; }
+
+#paginator div {
+  display: inline-block;
+  margin-left: 20px;
+  padding: 4px 10px 4px 10px;
+  border-radius: 5px;
+  background: #393A38;
+  color: white; }
+
 /*# sourceMappingURL=style.css.map */

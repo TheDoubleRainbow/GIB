@@ -19600,7 +19600,8 @@ Vue.component('search', {
 
 Vue.component('issues', {
 	template: ` <div>
-				<div class="issue" v-for="issue in issues" v-bind:id="'id-'+issue.id"> 
+				<div class="loading-div" v-if="issues.length == 0"><img class="loading-img" src="/img/loading.gif" /></div>
+				<div class="issue" v-if="issues.length != 0" v-for="issue in issues" v-bind:id="'id-'+issue.id"> 
 							<div class="issue-header" @click="openIssue(issue, $event)">
 								<div class="issue-header-status" :style="{background: stateBg(issue.state)}"></div>
 								<div class="issue-header-title"> {{issue.title}} </div>
@@ -19627,7 +19628,12 @@ Vue.component('issues', {
 							</div>
 							<chat :chatid="'chat'+issue.id">
 							</chat>
-				</div></div>`,
+				</div>
+				<div id="paginator" v-if="issues.length > 29">
+				<div id="prev">Prev page</div>
+				<div id="next">Next page</div>
+				</div>
+				</div>`,
 	data: function(){
 		return {
 			issues: [],
