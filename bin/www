@@ -58,6 +58,7 @@ io.on('connection', function (socket) {
       }
       else{
         getMessages({repo: message.repo, chat: message.chat}, socket)
+        console.log({repo: message.repo, chat: message.chat})
       }
       });        
     })
