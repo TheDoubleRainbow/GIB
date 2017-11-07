@@ -31,7 +31,7 @@ var getMessages = function(data, socket){
     db.collection('messages', function (err, collection) {
           collection.find({repo: data.repo, chat: data.chat}).toArray(function(err, items) {
               if(err) throw err; 
-              io.sockets.emit("messagesList", items);           
+              io.sockets.emit(items.chat, items);           
           });
         
       });         

@@ -45,7 +45,7 @@ Vue.component('chat', {
 			if(this.input != ""){
 				var socket = io.connect();
 				var that = this
-				socket.on('messagesList', function(messages){
+				socket.on(this.chatid, function(messages){
 					that.messages = messages;
 					document.getElementById(that.chatid).querySelector(".chat-display").scrollTop = 999999;
 				});
