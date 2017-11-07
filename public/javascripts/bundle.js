@@ -19785,7 +19785,7 @@ app = new Vue({
 Vuex = __webpack_require__(16);
 store = new Vuex.Store({
     state: {
-        userData: {token: user_data.token, auth: user_data.authorized, login: "", avatar: ""},
+        userData: user_data,
         //userData:{token: "", auth: false},
         repoData: {owner: "", repo: "", available: false, changed: false},
         labels: [],
@@ -20041,11 +20041,11 @@ IssuesBlock = Vue.component('issuesblock', {
 
 Start = Repo = Vue.component('start', {
 	template: `<div>
-					<div v-if="userData.auth">
+					<div v-if="userData.authorized">
 						<div id="welcome">Welcome to GIB</div> 
 						<search></search>
 					</div>
-					<div v-if="userData.auth == false">
+					<div v-if="userData.authorized == false">
 						<a href = "http://github.com/login/oauth/authorize?client_id=f343de2cdd05ffd0d470">GITHUB</a>
 					</div>
 				</div>`,
