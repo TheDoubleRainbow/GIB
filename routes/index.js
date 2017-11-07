@@ -72,7 +72,8 @@ router.post('/addReview', function(req, res, next) {
 		db.collection('review').insertOne( {
      		"repo": req.body.repo,
      		"user": req.body.user,
-     		"text": req.body.text
+     		"text": req.body.text,
+     		"avatar": req.body.avatar
    		}, function(err, result) {
     		console.log("New review added: " + req.body.user + ": " + req.body.text + " to repo: " + req.body.repo);
 			if(err){

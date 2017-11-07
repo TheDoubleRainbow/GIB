@@ -155,7 +155,7 @@ Reviews = Vue.component('reviews', {
 								<div v-if="reviews.length == 0 && loaded" class="reviews-none">There're no reviews yet. Feel free to add one.</div>
 								<div class="review animated pulse" v-for="review in reviews">
 									<div class="review-header">
-										Review by {{review.user}} 
+										Review by <a :href="'https://github.com/'+review.user"><img :src="review.avatar" />{{review.user}} </a>
 									</div>
 									<div class="review-body">
 										<p>
@@ -216,7 +216,8 @@ Reviews = Vue.component('reviews', {
 			var that = this
 			axios.post('/addReview', {
 				    repo: that.$route.params.owner+"/"+that.$route.params.repo,
-				    user: this.$store.getters.userData.login ,
+				    user: this.$store.getters.userData.login,
+				    avatar: this.$store.getters.userData.avatar,
 				    text: that.reviewText
 				  })
 				  .then(function (response) {
@@ -19494,7 +19495,7 @@ Vue.component('chat', {
 				<a @click="closeChat" class="delete chat-close"></a>
 				<div class="chat-display">
 					<div v-if="messages.length == 0" class="messages-none">This chat has no messages.</div>
-					<div :class="getMessageType(message)" v-for="message in messages">{{message.user + ': ' + message.text}}</div>
+					<div :class="getMessageType(message)" v-for="message in messages"><a :href="'https://github.com/' + message.user"><img class="chatavatar" :src="message.avatar" /></a><div><a class="message-url" :href="'https://github.com/' + message.user">{{message.user}}</a>{{': ' + message.text}}</div></div>
 				</div>
 		        <div class="chat-input">
 		          <input @keyup.enter="sendMessage" v-model="input" type="text" placeholder="Enter your message" name="input" class="input messages-input" />
@@ -19537,7 +19538,7 @@ Vue.component('chat', {
 					that.messages = messages;
 					document.getElementById(that.chatid).querySelector(".chat-display").scrollTop = 999999;
 				});
-				socket.emit("newMessage", {user: this.$store.getters.userData.login, text: this.input, repo: this.$route.params.owner+"/"+this.$route.params.repo, chat: this.chatid})
+				socket.emit("newMessage", {user: this.$store.getters.userData.login, avatar: this.$store.getters.userData.avatar, text: this.input, repo: this.$route.params.owner+"/"+this.$route.params.repo, chat: this.chatid})
 				//this.messages.push({user: "Me", text: this.input})
 				this.input = ""
 			}
@@ -19705,26 +19706,42 @@ var loops = 1;
 Vue.component('labels', {
 	template: `<div><b>Labels:</b>
 					<ul>
-						<li v-on:click="toogle($event)" v-for="(label, typeindex) in labels">
-							<span class="label-type">{{label.type}}</span>
+						<li v-on:click="toogle($event, typeindex)" v-for="(label, typeindex) in labels">
+							<span class="label-type">{{label.type}}</span><span v-if="$store.getters.labels[typeindex].subtypes.length != 0" :class="$store.getters.labels[typeindex].selected ? 'switcherM' : 'switcherP'">{{$store.getters.labels[typeindex].selected ? '-' : '+'}}</span>
 							<ul v-if="label.subtypes.length" class = "sub-types">
 								<li class="label-subtype" v-for="(subtype, subtypeindex) in label.subtypes" v-on:click="selectSubLabel(typeindex, subtypeindex)">
 									{{subtype.subtype}}
-									<span> {{selected(typeindex, subtypeindex) ? '-' : '+'}} </span>
+									<span :class="selected(typeindex, subtypeindex) ? 'switcherM' : 'switcherP'"> {{selected(typeindex, subtypeindex) ? '-' : '+'}} </span>
 								</li>
 							</ul>
 						</li>
 					</ul>
 			</div>`,
 	methods: {
-		toogle: function(event){
+		toogle: function(event, typeindex){
 			var subMenu = event.target.parentNode.querySelectorAll('.sub-types')[0];
 			if(subMenu != undefined){
-				if (subMenu.classList.contains('selected')) {
-		            subMenu.classList.remove("selected");
-		        } else {
-		            subMenu.classList.add("selected");
-		        }
+				if(event.target.className[0] == "s"){
+					if(this.$store.getters.labels[typeindex].selected == undefined){
+						this.$store.getters.labels[typeindex].selected = true
+					}
+					else{
+						this.$store.getters.labels[typeindex].selected = !this.$store.getters.labels[typeindex].selected
+					}
+					for(var i = 0; i < this.$store.getters.labels[typeindex].subtypes.length; i++){
+						this.$store.getters.labels[typeindex].subtypes[i].selected = !this.$store.getters.labels[typeindex].subtypes[i].selected
+					}
+				}
+				else{
+					if (subMenu.classList.contains('selected')) {
+			            subMenu.classList.remove("selected");
+			        } else {
+			            subMenu.classList.add("selected");
+			        }
+				}
+			}
+			else{
+				//Request for empty sebtypes
 			}
 	    },
 	    selectSubLabel(typeIndex, subTypeIndex){
@@ -20137,9 +20154,9 @@ Start = Repo = Vue.component('start', {
 						<div id="welcome">Welcome to GIB</div> 
 						<search v-if="userData.authorized"></search>
 					</div>
-					<div id="gitlogin" v-if="userData.authorized == false">
-						<a href = "http://github.com/login/oauth/authorize?client_id=f343de2cdd05ffd0d470">Login with GitHub</a>
-					</div>
+					<a href = "http://github.com/login/oauth/authorize?client_id=f343de2cdd05ffd0d470"><div id="gitlogin" v-if="userData.authorized == false">
+						Login with GitHub
+					</div></a>
 				</div>`,
 	computed: {
 	    	userData: function () {
