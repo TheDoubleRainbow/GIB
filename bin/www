@@ -40,7 +40,16 @@ var getMessages = function(data, socket){
 io.on('connection', function (socket) { 
 
   socket.on('getMessages', function(data){
-    getMessages(data, socket)
+    MongoClient.connect(db.url, (err, db) => {
+    if (err) return console.log(err)
+    db.collection('messages', function (err, collection) {
+          collection.find({repo: data.repo, chat: data.chat}).toArray(function(err, items) {
+              if(err) throw err; 
+              io.sockets.emit("messagesList", items);           
+          });
+        
+      });         
+   })
   });
 
   socket.on('newMessage', function(message){ 
