@@ -31,12 +31,13 @@ Repo = Vue.component('repo', {
 
 	methods: {
 		getRepoData: function(){
+			console.log("getRepoData");
 			var changed = false;
 			var that = this;
 			if(that.$route.params.owner != that.$store.getters.repoData.owner || that.$route.params.repo != that.$store.getters.repoData.repo){
 				   	changed = true;
 				    	//console.log("changed");    
-				console.log("getRepoData");
+				
 
 				//axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}?access_token=${that.$store.getters.userData.token}`)
 				axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}?access_token=b064f1bc0e424141d2858e4f55e7a30fac240a02`)

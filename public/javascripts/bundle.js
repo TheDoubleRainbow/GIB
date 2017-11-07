@@ -19668,10 +19668,13 @@ var loops = 1;
 Vue.component('labels', {
 	template: `<div><b>Labels:</b>
 					<ul>
-						<li v-on:click="toogle($event)" v-for="label in labels">
+						<li v-on:click="toogle($event)" v-for="(label, typeindex) in labels">
 							<span class="label-type">{{label.type}}</span>
-							<ul v-if="checkSubtypes(label.subtypes)" class = "sub-types">
-								<li class="label-subtype" v-for="subtype in label.subtypes">{{subtype}}</li>
+							<ul v-if="label.subtypes.length" class = "sub-types">
+								<li class="label-subtype" v-for="(subtype, subtypeindex) in label.subtypes" v-on:click="selectSubLabel(typeindex, subtypeindex)">
+									{{subtype.subtype}}
+									<span> {{selected(typeindex, subtypeindex) ? '-' : '+'}} </span>
+								</li>
 							</ul>
 						</li>
 					</ul>
@@ -19687,14 +19690,45 @@ Vue.component('labels', {
 		        }
 			}
 	    },
+	    selectSubLabel(typeIndex, subTypeIndex){
+	    	var selected = !this.selected(typeIndex, subTypeIndex);
+	    	this.$store.dispatch('selectLabel', {typeIndex, subTypeIndex, selected});
+	    	var labels = [];
+	    	this.$store.getters.labels.forEach(function(item, i, arr){
+	    		item.subtypes.forEach(function(item1, i1, arr1){
+	    			if(item1.selected){
+	    				labels.push(item.type + ": " + item1.subtype);
+	    			}
+	    		});
+	    	});
+	    	console.log(labels);
+	    	this.$router.push('/');
+	    	var path = `${this.$store.getters.repoData.owner}/${this.$store.getters.repoData.repo}`;
+	    	this.$router.push({ path: path, query: labels.length ? { labels: labels.join(","), page: 1 } : {page:1}})
+	    	//console.log(this.$router.)
+	    },
+
+	    loadLabels: function(){
+	    	if(this.$store.getters.repoData.changed){
+	    		this.$store.getters.repoData.changed = false;
+				this.$store.dispatch('loadLabels', { owner: this.$store.getters.repoData.owner, repo: this.$store.getters.repoData.repo });
+			}
+	    },
+	    selected(typeIndex, subTypeIndex){
+	    	return this.$store.getters.labels[typeIndex].subtypes[subTypeIndex].selected
+	    }
 	},
-	//updated: function(){
-		//
+	created: function(){
+		this.loadLabels();
+	},
+	updated: function(){
+		
 		//	if(this.$store.getters.repoData.changed){
 		//		console.log("loadLabels");
 		//		this.$store.dispatch('loadLabels', { owner: this.$store.getters.repoData.owner, repo: this.$store.getters.repoData.repo });
 		//	}
-		//},
+		this.loadLabels();
+		},
 	mounted: function(){
 			this.$store.watch(
 				  function(state){
@@ -19702,27 +19736,18 @@ Vue.component('labels', {
 				  },
 				  (repoData) => {
 				  		console.log("watch");
-				  		console.log(repoData.changed);
-				  		if(repoData.changed){
-				  			console.log("loadLabelsinwatch");
-							this.$store.dispatch('loadLabels', { owner: this.$store.getters.repoData.owner, repo: this.$store.getters.repoData.repo });
-						}
+				  		//console.log(repoData.changed);
+				  		this.loadLabels();
+				  		
 					}
 			)
 	},
 
-    checkSubtypes: function(sub){
-    	let ret = true
-    	if(sub[0] == ""){
-    		ret = false
-    	}
-    	return ret
-    },
 	computed: {
 	    	labels: function () {
 	      		return this.$store.getters.labels;
 	      		//return [];
-	    	}
+	    	},
   	}
 })
 
@@ -19798,6 +19823,7 @@ store = new Vuex.Store({
             commit('SET_REPODATA', repoData);
         },
         loadLabels({commit}, repoData) {
+                //var labels = [{name: "NoLabled", type: "NoLabled", subtypes: [], color: ""}];
                 var labels = [];
                 var loops = 1;
                 load();
@@ -19808,19 +19834,19 @@ store = new Vuex.Store({
                         response.data.forEach(function(item, i, arr) {
                             var typeArray = item.name.split(": ");
                             var found = false;
-
                             labels.forEach(function(item1, i1, arr1){
                                 if(item1.type == typeArray[0]){
-                                    labels[i1].subtypes.push(typeArray[1] ? typeArray[1] : "");
+                                    labels[i1].subtypes.push({subtype: typeArray[1], selected: false});
                                     found = true;
                                 }
                             })
                             if(found == false){
-                                var subtype = typeArray[1] ? typeArray[1] : "";
-                                labels.push({name: item.name, type: typeArray[0], subtypes: [subtype], color: item.color});
+                                var subtype = typeArray[1];// ? typeArray[1];
+                                labels.push({name: item.name, type: typeArray[0], subtypes: subtype ? [{subtype: subtype, selected: false}] : [], color: item.color});
                             }
                         });
                         loops++;
+
                         if(response.data.length == 30){
                             load();
                         }
@@ -19830,8 +19856,13 @@ store = new Vuex.Store({
                         console.log("error");
                      });
                 }
-
             commit('SET_LABELS', labels);
+
+            //function prepareLabels
+        },
+        selectLabel({commit}, payload){
+            commit("SELECT_LABEL", payload);
+
         }
     },
     mutations: {     
@@ -19841,8 +19872,13 @@ store = new Vuex.Store({
         SET_REPODATA(state, repoData) {
             state.repoData = repoData;
         },
-        SET_LABELS(state, labels) {
+        SET_LABELS(state, labels){
             state.labels = labels;
+        },
+        SELECT_LABEL(state, {typeIndex, subTypeIndex, selected}){
+            //console.log("ti " +typeIndex + " sti " + subTypeIndex + " value " + selected);
+            state.labels[typeIndex].subtypes[subTypeIndex].selected = selected;
+            //console.log(value);
         }
     },
     getters: {
@@ -19910,14 +19946,16 @@ Repo = Vue.component('repo', {
 
 	methods: {
 		getRepoData: function(){
+			console.log("getRepoData");
 			var changed = false;
 			var that = this;
 			if(that.$route.params.owner != that.$store.getters.repoData.owner || that.$route.params.repo != that.$store.getters.repoData.repo){
 				   	changed = true;
 				    	//console.log("changed");    
-				console.log("getRepoData");
+				
 
-				axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}`)
+				//axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}?access_token=${that.$store.getters.userData.token}`)
+				axios.get(`https://api.github.com/repos/${that.$route.params.owner}/${that.$route.params.repo}?access_token=b064f1bc0e424141d2858e4f55e7a30fac240a02`)
 					  .then(function (response) {
 					  	console.log("axios");
 					    
@@ -20000,7 +20038,27 @@ IssuesBlock = Vue.component('issuesblock', {
 			}
 	},
 	created: function(){
-			//this.repoData = this.repodata;
+
+			var that = this;
+
+			/*if(that.$route.query.labels){
+				that.$route.query.labels.split(',').forEach(function(item, i, arr) {
+                        var typeArray = item.name.split(": ");
+                        var found = false;
+                        that.$store.labels.forEach(function(item1, i1, arr1){
+                            if(item1.type == typeArray[0]){
+                                //labels[i1].subtypes.push({subtype: typeArray[1], selected: false});
+                                //that.
+                                found = true;
+                            }
+                        });
+                        if(found == false){
+                            var subtype = typeArray[1];// ? typeArray[1];
+                            labels.push({name: item.name, type: typeArray[0], subtypes: subtype ? [{subtype: subtype, selected: false}] : [], color: item.color});
+                        }
+                    });
+			}*/
+
 			this.getReviewsAmount()
 			},
 	methods:{
