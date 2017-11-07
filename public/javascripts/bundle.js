@@ -20041,12 +20041,12 @@ IssuesBlock = Vue.component('issuesblock', {
 
 Start = Repo = Vue.component('start', {
 	template: `<div>
-					<div v-if="userData.authorized">
+					<div>
 						<div id="welcome">Welcome to GIB</div> 
-						<search></search>
+						<search v-if="userData.authorized"></search>
 					</div>
-					<div v-if="userData.authorized == false">
-						<a href = "http://github.com/login/oauth/authorize?client_id=f343de2cdd05ffd0d470">GITHUB</a>
+					<div id="gitlogin" v-if="userData.authorized == false">
+						<a href = "http://github.com/login/oauth/authorize?client_id=f343de2cdd05ffd0d470">Login with GitHub</a>
 					</div>
 				</div>`,
 	computed: {
@@ -20072,18 +20072,18 @@ Repodata = Vue.component('repodata', {
 							</div>
 					</div>
 				</div>
-				<div class="loading-div-repodata" v-if="loaded<2"><img class="loading-img" src="/img/loading.gif" /></div>
-				<div v-if="loaded>2" id = "reviews" class = "columns is-centered">
+				<div class="loading-div-repodata" v-if="fidata.data.length < 100"><img class="loading-img" src="/img/loading.gif" /></div>
+				<div v-if="fidata.data.length > 100" id = "reviews" class = "columns is-centered">
 					<div class = "column is-4-widescreen is-4-fullhd is-5-desktop">
 						<div :class="getFIRatioType()">
 							<div v-if="showFI">
-							<div v-if="enoughfi" class="fi-header">FI Ratio: {{fiRatio}}% ({{fitype}})</div>
+							<div v-if="enoughfi" class="fi-header">FI Ratio: {{fiRatio}}% ({{fitype}}*)</div>
 							<div class="fi-body">
 								<div v-if="!enoughfi"> Not enough data</div>
 								<div v-if="enoughfi">Usualy it takes {{fidata.average}} days to integrate feature for this repository.</div>
 							</div> 
 							<div v-if="enoughfi" class="fi-footer">
-								<div class="fi-issue">Fastest issue: {{fidata.best}}</div><div class="fi-issue fi-issue-worst">Longest issue: {{fidata.worst}}</div>
+								<div class="fi-issue">Fastest issue: {{fidata.best}}d</div><div class="fi-issue fi-issue-worst">Longest issue: {{fidata.worst}}d</div>
 							</div>
 							</div>
 						</div>
@@ -20097,12 +20097,13 @@ Repodata = Vue.component('repodata', {
 								<div v-if="enoughdf">Usualy it takes {{dfdata.average}} days to fix bug for this repository.</div>
 							</div> 
 							<div v-if="enoughdf" class="fi-footer">
-								<div class="fi-issue">Fastest issue: {{dfdata.best}}</div><div class="fi-issue fi-issue-worst">Longest issue: {{dfdata.worst}}</div>
+								<div class="fi-issue">Fastest issue: {{dfdata.best}}d</div><div class="fi-issue fi-issue-worst">Longest issue: {{dfdata.worst}}d</div>
 							</div>
 							</div>
 						</div>
 					</div>
-				</div>
+
+				</div><div class="fiinfo">*FI ratio is valid for 500 last issues</div>
 			</div></div></div>`,
 	data: function() {
 		return {
@@ -20288,7 +20289,7 @@ Repodata = Vue.component('repodata', {
 	                        	that.enoughdf = true;
 	                        }
 	                        if(response.data.length == 30){
-	                        	loaddr();
+	                        	loaddfr();
 	                        	loopdfr++
 	                        }
 	                        else{
@@ -20296,7 +20297,7 @@ Repodata = Vue.component('repodata', {
 	                        }
 	                      })
 	                      .catch(function (error) {
-	                        console.log("error");
+	                        console.log("error1");
 	                     });
 				}
 				function loaddfn(){
@@ -20318,7 +20319,7 @@ Repodata = Vue.component('repodata', {
 	                        }
 	                      })
 	                      .catch(function (error) {
-	                        console.log("error");
+	                        that.loaded++
 	                     });
 				}
 				loaddfr();
