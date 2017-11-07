@@ -1,7 +1,8 @@
 Vuex = require("./lib/vuex.min.js");
 store = new Vuex.Store({
     state: {
-        userData: {token: user_data.token, auth: user_data.auth, login: "", avatar: ""},
+        userData: user_data,
+        //userData:{token: "", auth: false},
         repoData: {owner: "", repo: "", available: false, changed: false},
         labels: [],
     },

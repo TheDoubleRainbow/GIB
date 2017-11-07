@@ -10,49 +10,49 @@ var ClientSecret = "73bce73daf27ff16886af0b3ad64c51d0038345f"
 /* GET home page. */
 router.get('/', function(req, res, next) {
 		console.log("SID" + req.sessionID);
-	if (!req.session.token) {
-		
-	  	req.session.code = "";
-	   	req.session.token = "";
-	   	req.session.authorized = false;
+	if (!req.session.userData) {
+
+		req.session.userData = {};
+
+	  	req.session.userData.code = "";
+	   	req.session.userData.token = "";
+	   	req.session.userData.authorized = false;
+	   	req.session.userData.login = "";
+	   	req.session.userData.avatar = "";
+	   	req.session.userData.url = "";
 	   }
 
   	if(req.param('code')){
-	  	//bad_verification_code
-	  	var authorized = false;
 	  	fetch(`http://github.com/login/oauth/access_token?client_id=${ClientID}&client_secret=${ClientSecret}&code=${req.param('code')}&accept=json`)
 	  			    .then(function(response) {
         				return response.buffer();
     				}).then(function(buffer) {
         				var token = buffer.toString().split("&")[0].split("=")[1];
         				if(token != "bad_verification_code"){
-        					authorized = true;
-        					console.log("GetTOken" + token);
-        					req.session.code = req.param('code');
-	   			 			req.session.token = token;
-	   			 			req.session.authorized = authorized;
-	   			 			req.session.save(function(err) {
-  								// session saved
-							});
-	   			 			//res.send(token);
-	   			 			res.redirect('/');
-	   			 			//next();
-
+        					req.session.userData.code = req.param('code');
+	   			 			req.session.userData.token = token;
+	   			 			req.session.userData.authorized = true;
+	   			 			console.log("authorized");
+	   			 				fetch(`http://api.github.com/user?access_token=${token}`)
+	   			 				.then(function(response) {
+    								response.json().then(function(data) {
+    									console.log("Login");
+      									req.session.userData.login = data.login;
+      									req.session.userData.avatar = data.avatar_url;
+      									req.session.userData.url = data.url;
+      									req.session.save(function(err) {
+										});
+										res.redirect('/');
+    								});
+  								});
+	
         				}
-        				//res.send(token);
-
     				});
   	} else {
-  		//res.render('index', {data: {access_token: req.session.token, auth: req.session.authorized}});
-  		res.render('index', {data: {token: req.session.token, auth: req.session.authorized}});
-  		//next();
+  		//res.render('index', {data: {token: req.session.token, auth: req.session.authorized}});
+  		res.render('index', {data: req.session.userData});
   	}
 });
-
-//router.get('/auth/github/callback', function(req, res, next) {
-		
-//});
-
 router.get('/getReviews/:owner/:repo', function(req, res, next) {
 	MongoClient.connect(db.url, (err, db) => {
 		if (err) return console.log(err)
