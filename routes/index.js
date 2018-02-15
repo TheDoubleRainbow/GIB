@@ -5,7 +5,7 @@ var MongoClient = require('mongodb').MongoClient;
 var db = {url: "mongodb://gib:qwerty@ds245805.mlab.com:45805/heroku_dt4zfk5h"}
 
 var ClientID = "f343de2cdd05ffd0d470"
-var ClientSecret = "73bce73daf27ff16886af0b3ad64c51d0038345f"
+var ClientSecret = "4d1c007bda1debdbd5684f9d0e0074a70f3eff9b"
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
