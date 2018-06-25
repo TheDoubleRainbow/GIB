@@ -1,7 +1,9 @@
 # GIB
 
 GIB is app that display info and stats about GitHub\`s repos issues
-<img src="Screen Shot 2018-06-25 at 2.01.22 PM.png" />
+<br />
+<img height='360px' src="Screen Shot 2018-06-25 at 2.01.22 PM.png" />
+<br />
 Heroku:<br />
 https://gib-itrev.herokuapp.com/#/ <br />
 note: to test use heroku because github oauth supports only one redirect link and it's set to heroku<br />
