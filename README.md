@@ -1,6 +1,6 @@
 # GIB
 
-GIB is app that display info and stats about GitHub\`s repos issues
+GIB is app that display info and stats about GitHub\`s repo issues
 <br />
 <img height='360px' src="Screen Shot 2018-06-25 at 2.01.22 PM.png" />
 <br />
