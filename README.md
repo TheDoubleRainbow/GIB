@@ -1,8 +1,10 @@
 # GIB
 
+GIB is app that display info and stats about GitHub\`s repos issues
+
 Heroku:<br />
 https://gib-itrev.herokuapp.com/#/ <br />
-note: pls use heroku because github oauth supports only one redirect link and it's set to heroku<br />
+note: to test use heroku because github oauth supports only one redirect link and it's set to heroku<br />
 
 How to use: <br />
  - Step 1: Log in <br />
